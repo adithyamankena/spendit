@@ -1,7 +1,7 @@
 {
   "name": "SpendIt",
   "short_name": "SpendIt",
-  "description": "Personal finance dashboard",
+  "description": "Private personal finance dashboard",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

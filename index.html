@@ -251,16 +251,52 @@ button,a,select,input{touch-action:manipulation}
   .mobile-top-row{min-height:42px}
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+#authScreen{
+ position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;
+ padding:22px;background:
+ radial-gradient(circle at 20% 10%,rgba(89,225,255,.16),transparent 35%),
+ radial-gradient(circle at 80% 90%,rgba(255,103,199,.14),transparent 38%),
+ var(--bg);
+}
+.auth-card{
+ width:min(430px,100%);padding:30px;border:1px solid var(--line);border-radius:28px;
+ background:rgba(17,20,38,.78);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
+ box-shadow:0 24px 80px rgba(0,0,0,.45);
+}
+.auth-logo{font-size:34px;font-weight:900;letter-spacing:-1.5px;margin-bottom:8px}
+.auth-logo span{background:linear-gradient(90deg,var(--cyan),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent}
+.auth-sub{color:var(--muted);margin-bottom:24px}
+.auth-error{color:#ff9aa5;background:rgba(255,107,122,.1);border:1px solid rgba(255,107,122,.25);padding:10px 12px;border-radius:12px;margin-bottom:12px;display:none}
+.auth-status{color:var(--muted);font-size:13px;margin-top:12px;min-height:18px}
+.auth-btn{width:100%;margin-top:8px}
+.user-chip{font-size:12px;color:var(--muted);padding:7px 10px;border:1px solid var(--line);border-radius:999px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sync-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:6px}
+@media(max-width:700px){.auth-card{padding:24px;border-radius:24px}}
+</style>
 
-<link rel="manifest" href="./manifest.webmanifest">
-<meta name="theme-color" content="#080a12">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="SpendIt">
-<link rel="apple-touch-icon" href="./icon-192.png">
 </head>
 <body>
+
+<div id="authScreen">
+  <div class="auth-card">
+    <div class="auth-logo">Spend<span>It</span></div>
+    <div class="auth-sub">Your private finance dashboard. Sign in to access your synced data.</div>
+    <div class="auth-error" id="authError"></div>
+    <div>
+      <label>Email</label>
+      <input id="loginEmail" type="email" autocomplete="email" placeholder="Your email address">
+    </div>
+    <div style="margin-top:12px">
+      <label>Password</label>
+      <input id="loginPassword" type="password" autocomplete="current-password" placeholder="Your password">
+    </div>
+    <button class="btn primary auth-btn" id="loginBtn" onclick="login()">Sign in</button>
+    <div class="auth-status" id="authStatus">Your data syncs between your devices after you sign in.</div>
+  </div>
+</div>
+
 <div class="app">
 <aside class="sidebar">
  <div class="brand">Spend<span>It</span></div>
@@ -269,8 +305,9 @@ button,a,select,input{touch-action:manipulation}
 <main class="main">
  <header class="topbar">
   <div class="mobile-top-brand">Spend<span>It</span></div>
-  <div class="mobile-top-row"><div class="top-title" id="topTitle">Home</div>
+  <div class="mobile-top-row"><div class="top-title" id="topTitle">Your Data</div>
   <div class="top-actions">
+   <span class="user-chip" id="userChip"><span class="sync-dot"></span>Syncing</span>
    <button class="btn" onclick="openCSV()">Import CSV</button>
    <button class="btn" onclick="openIncome()">+ Add income</button>
    <button class="btn primary" onclick="openExpense()">+ Add expense</button>
@@ -290,15 +327,34 @@ button,a,select,input{touch-action:manipulation}
 <div class="toast" id="toast"></div>
 
 <script>
-const STORAGE='spendit_clean_v1';
+/* SpendIt cloud version: Supabase Auth + Postgres RLS */
+const SUPABASE_URL = 'https://rxltvwmeudjycjxvszet.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_-cbC2jJL6mWkZSJc-bKsvw_WvnGel_R';
+const { createClient } = window.supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+});
+
 const BANKS=['HDFC','SBI','Punjab'];
 const METHODS=['Google Pay','PhonePe','Cash','Account Transfer'];
 const CATEGORIES=['Housing','Groceries','Shopping','Dining','Transportation','Utilities','Subscriptions','Insurance','Health','Entertainment','Income','Needs review','Other'];
-let state=loadState(), page='Dashboard', selectedMonth=new Date().toISOString().slice(0,7);
 
-function freshState(){return {transactions:[],categories:[...CATEGORIES],banks:[...BANKS],paymentMethods:[...METHODS],budgets:[],goals:[],recurring:[],subscriptions:[],rules:[],settings:{assets:0,liabilities:0,netWorthConfigured:false}}}
-function loadState(){try{const x=JSON.parse(localStorage.getItem(STORAGE));return x||freshState()}catch(e){return freshState()}}
-function save(){localStorage.setItem(STORAGE,JSON.stringify(state))}
+let state = {
+  transactions:[],
+  categories:[...CATEGORIES],
+  banks:[...BANKS],
+  paymentMethods:[...METHODS],
+  budgets:[],
+  goals:[],
+  recurring:[],
+  subscriptions:[],
+  rules:[],
+  settings:{assets:0,liabilities:0,netWorthConfigured:false}
+};
+let page='Dashboard';
+let selectedMonth=new Date().toISOString().slice(0,7);
+let currentUser=null;
+
 function money(n){return new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:2}).format(Number(n)||0)}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
@@ -309,108 +365,261 @@ modal.addEventListener('click',e=>{if(e.target===modal)closeModal()});
 
 const navItems=['Dashboard','Transactions','Income','Recurring','Subscriptions','Budgets','Goals','Documents','Rules','Settings'];
 function renderNav(){
- const markup=navItems.map(x=>`<button class="${page===x?'active':''}" onclick="go('${x}')">${x==='Dashboard'?'Dashboard':x}</button>`).join('');
- nav.innerHTML=markup;mobileNav.innerHTML=markup;
+  const markup=navItems.map(x=>`<button class="${page===x?'active':''}" onclick="go('${x}')">${x}</button>`).join('');
+  nav.innerHTML=markup;mobileNav.innerHTML=markup;
 }
 function go(p){page=p;renderNav();render();window.scrollTo({top:0,behavior:'smooth'})}
-function render(){topTitle.textContent=page==='Dashboard'?'Home':page;const fn={Dashboard:dashboard,Transactions:transactions,Income:income,Recurring:recurring,Subscriptions:subscriptions,Budgets:budgets,Goals:goals,Documents:documents,Rules:rules,Settings:settings}[page];content.innerHTML=fn()}
+function render(){
+  topTitle.textContent=page==='Dashboard'?'Your Data':page;
+  const fn={Dashboard:dashboard,Transactions:transactions,Income:income,Recurring:recurring,Subscriptions:subscriptions,Budgets:budgets,Goals:goals,Documents:documents,Rules:rules,Settings:settings}[page];
+  content.innerHTML=fn();
+}
 function periodOptions(){
- const months={};
- state.transactions.forEach(t=>{if(t.date)months[t.date.slice(0,7)]=1});
- const now=new Date();months[now.toISOString().slice(0,7)]=1;
- for(let i=1;i<12;i++){const d=new Date(now.getFullYear(),now.getMonth()-i,1);months[d.toISOString().slice(0,7)]=1}
- return Object.keys(months).sort().reverse();
+  const months={};
+  state.transactions.forEach(t=>{if(t.date)months[t.date.slice(0,7)]=1});
+  const now=new Date();months[now.toISOString().slice(0,7)]=1;
+  for(let i=1;i<12;i++){const d=new Date(now.getFullYear(),now.getMonth()-i,1);months[d.toISOString().slice(0,7)]=1}
+  return Object.keys(months).sort().reverse();
 }
 function monthLabel(k){const [y,m]=k.split('-');return new Date(+y,+m-1,1).toLocaleDateString('en-IN',{month:'long',year:'numeric'})}
 function monthSelect(){return `<select class="period" onchange="selectedMonth=this.value;render()">${periodOptions().map(m=>`<option value="${m}" ${m===selectedMonth?'selected':''}>${monthLabel(m)}</option>`).join('')}</select>`}
 function monthlyTransactions(){return state.transactions.filter(t=>t.date&&t.date.slice(0,7)===selectedMonth).sort((a,b)=>b.date.localeCompare(a.date))}
-function totals(arr){const income=arr.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0),spend=arr.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);return {income,spend,rate:income?((income-spend)/income)*100:0}}
+function totals(arr){const income=arr.filter(t=>t.type==='income').reduce((s,t)=>s+Number(t.amount),0),spend=arr.filter(t=>t.type==='expense').reduce((s,t)=>s+Number(t.amount),0);return {income,spend,rate:income?((income-spend)/income)*100:0}}
+
 function dashboard(){
- const arr=state.transactions, t=totals(arr), nw=state.settings.netWorthConfigured?money(state.settings.assets-state.settings.liabilities):'Not set';
- const recent=[...arr].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5);
- const cats={};arr.filter(x=>x.type==='expense').forEach(x=>cats[x.category]=(cats[x.category]||0)+x.amount);
- const max=Math.max(...Object.values(cats),1);
- return `<div class="page-head"><div><h1>Your Data</h1><div class="hint">Your personal money snapshot</div></div></div>
- <div class="cards">
-  <div class="card"><div class="label">NET WORTH</div><div class="value">${nw}</div><div class="hint">${nw==='Not set'?'Set it in Settings':'Assets minus liabilities'}</div></div>
-  <div class="card"><div class="label">TOTAL INCOME</div><div class="value">${money(t.income)}</div><div class="hint">All recorded income</div></div>
-  <div class="card"><div class="label">TOTAL SPENDING</div><div class="value">${money(t.spend)}</div><div class="hint">All recorded expenses</div></div>
-  <div class="card"><div class="label">SAVINGS RATE</div><div class="value">${t.rate.toFixed(1)}%</div><div class="hint">Based on recorded income/spending</div></div>
- </div>
- <div class="grid2">
-  <section class="section"><h2>Spending vibe 📊</h2>${Object.keys(cats).length?`<div class="bar-wrap">${Object.entries(cats).slice(0,7).map(([k,v])=>`<div class="bar" style="height:${Math.max(7,(v/max)*175)}px"><span>${esc(k)}</span></div>`).join('')}</div>`:`<div class="empty">No spending data yet.<br>Add an expense to start your dashboard.</div>`}</section>
-  <section class="section"><h2>Top spending</h2>${Object.keys(cats).length?Object.entries(cats).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([k,v])=>`<div class="statrow"><span>${esc(k)}</span><strong>${money(v)}</strong></div>`).join(''):`<div class="empty">Nothing to show yet.</div>`}</section>
- </div>
- <section class="section" style="margin-top:16px"><h2>Recent activity</h2>${recent.length?`<div style="overflow:auto"><table><thead><tr><th>Date</th><th>Source / Merchant</th><th>Category</th><th>Bank</th><th>Payment method</th><th>Amount</th></tr></thead><tbody>${recent.map(txRow).join('')}</tbody></table></div>`:`<div class="empty">No transactions yet. Use <b style="margin:0 4px">+ Add income</b> or <b style="margin-left:4px">+ Add expense</b>.</div>`}</section>`;
+  const arr=state.transactions, t=totals(arr), nw=state.settings.netWorthConfigured?money(state.settings.assets-state.settings.liabilities):'Not set';
+  const recent=[...arr].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5);
+  const cats={};arr.filter(x=>x.type==='expense').forEach(x=>cats[x.category]=(cats[x.category]||0)+Number(x.amount));
+  const max=Math.max(...Object.values(cats),1);
+  return `<div class="page-head"><div><h1>Your Data</h1><div class="hint">Private cloud-synced money snapshot</div></div></div>
+  <div class="cards">
+   <div class="card"><div class="label">NET WORTH</div><div class="value">${nw}</div><div class="hint">${nw==='Not set'?'Set it in Settings':'Assets minus liabilities'}</div></div>
+   <div class="card"><div class="label">TOTAL INCOME</div><div class="value">${money(t.income)}</div><div class="hint">All recorded income</div></div>
+   <div class="card"><div class="label">TOTAL SPENDING</div><div class="value">${money(t.spend)}</div><div class="hint">All recorded expenses</div></div>
+   <div class="card"><div class="label">SAVINGS RATE</div><div class="value">${t.rate.toFixed(1)}%</div><div class="hint">Based on recorded income/spending</div></div>
+  </div>
+  <div class="grid2">
+   <section class="section"><h2>Spending vibe 📊</h2>${Object.keys(cats).length?`<div class="bar-wrap">${Object.entries(cats).slice(0,7).map(([k,v])=>`<div class="bar" style="height:${Math.max(7,(v/max)*175)}px"><span>${esc(k)}</span></div>`).join('')}</div>`:`<div class="empty">No spending data yet.<br>Add an expense to start your dashboard.</div>`}</section>
+   <section class="section"><h2>Top spending</h2>${Object.keys(cats).length?Object.entries(cats).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([k,v])=>`<div class="statrow"><span>${esc(k)}</span><strong>${money(v)}</strong></div>`).join(''):`<div class="empty">Nothing to show yet.</div>`}</section>
+  </div>
+  <section class="section" style="margin-top:16px"><h2>Recent activity</h2>${recent.length?`<div style="overflow:auto"><table><thead><tr><th>Date</th><th>Source / Merchant</th><th>Category</th><th>Bank</th><th>Payment method</th><th>Amount</th><th></th></tr></thead><tbody>${recent.map(txRow).join('')}</tbody></table></div>`:`<div class="empty">No transactions yet. Use <b style="margin:0 4px">+ Add income</b> or <b style="margin-left:4px">+ Add expense</b>.</div>`}</section>`;
 }
-function txRow(t){return `<tr><td>${esc(t.date)}</td><td>${esc(t.merchant)}</td><td>${esc(t.category)}</td><td>${esc(t.bank||'—')}</td><td>${esc(t.paymentMethod||'—')}</td><td class="${t.type}">${t.type==='income'?'+':'−'}${money(t.amount)}</td></tr>`}
+
+function txRow(t){
+  const sign=t.type==='income'?'+':'−';
+  return `<tr><td>${esc(t.date)}</td><td>${esc(t.merchant)}</td><td>${esc(t.category)}</td><td>${esc(t.bank||'—')}</td><td>${esc(t.paymentMethod||'—')}</td><td class="${t.type}">${sign}${money(t.amount)}</td><td><button class="btn" onclick="editTransaction(${Number(t.id)})">Edit</button> <button class="btn" onclick="deleteTransaction(${Number(t.id)})">Delete</button></td></tr>`;
+}
+
 function transactions(){
- const arr=monthlyTransactions(),t=totals(arr);
- return `<div class="page-head"><div><h1>Transactions</h1><div class="hint">Complete transaction history for the selected month.</div></div><div style="display:flex;gap:9px;align-items:center">${monthSelect()}<button class="btn primary" onclick="openExpense()">+ Add expense</button></div></div>
- <div class="cards" style="margin-bottom:16px">
-  <div class="card"><div class="label">MONTH INCOME</div><div class="value">${money(t.income)}</div><div class="hint">${monthLabel(selectedMonth)}</div></div>
-  <div class="card"><div class="label">MONTH SPENDING</div><div class="value">${money(t.spend)}</div><div class="hint">${monthLabel(selectedMonth)}</div></div>
-  <div class="card"><div class="label">TRANSACTION COUNT</div><div class="value">${arr.length}</div><div class="hint">All entries this month</div></div>
-  <div class="card"><div class="label">NET FLOW</div><div class="value">${money(t.income-t.spend)}</div><div class="hint">Income minus spending</div></div>
- </div>
- <section class="section"><div style="display:flex;gap:10px;margin-bottom:15px"><input id="txSearch" placeholder="Search merchant, category, bank or payment method" oninput="filterTx()"><select id="txBank" onchange="filterTx()"><option value="">All banks</option>${BANKS.map(b=>`<option>${b}</option>`).join('')}</select></div>
- <div style="overflow:auto"><table id="txTable"><thead><tr><th>Date</th><th>Source / Merchant</th><th>Category</th><th>Bank</th><th>Payment method</th><th>Amount</th></tr></thead><tbody>${arr.map(txRow).join('')}</tbody></table></div>
- ${!arr.length?`<div class="empty">No transactions recorded for ${monthLabel(selectedMonth)}.</div>`:''}</section>`;
+  const arr=monthlyTransactions(),t=totals(arr);
+  return `<div class="page-head"><div><h1>Transactions</h1><div class="hint">Complete transaction history for the selected month.</div></div><div style="display:flex;gap:9px;align-items:center">${monthSelect()}<button class="btn primary" onclick="openExpense()">+ Add expense</button></div></div>
+  <div class="cards" style="margin-bottom:16px">
+   <div class="card"><div class="label">MONTH INCOME</div><div class="value">${money(t.income)}</div><div class="hint">${monthLabel(selectedMonth)}</div></div>
+   <div class="card"><div class="label">MONTH SPENDING</div><div class="value">${money(t.spend)}</div><div class="hint">${monthLabel(selectedMonth)}</div></div>
+   <div class="card"><div class="label">TRANSACTION COUNT</div><div class="value">${arr.length}</div><div class="hint">All entries this month</div></div>
+   <div class="card"><div class="label">NET FLOW</div><div class="value">${money(t.income-t.spend)}</div><div class="hint">Income minus spending</div></div>
+  </div>
+  <section class="section"><div style="display:flex;gap:10px;margin-bottom:15px"><input id="txSearch" placeholder="Search merchant, category, bank or payment method" oninput="filterTx()"><select id="txBank" onchange="filterTx()"><option value="">All banks</option>${BANKS.map(b=>`<option>${b}</option>`).join('')}</select></div>
+  <div style="overflow:auto"><table id="txTable"><thead><tr><th>Date</th><th>Source / Merchant</th><th>Category</th><th>Bank</th><th>Payment method</th><th>Amount</th><th></th></tr></thead><tbody>${arr.map(txRow).join('')}</tbody></table></div>
+  ${!arr.length?`<div class="empty">No transactions recorded for ${monthLabel(selectedMonth)}.</div>`:''}</section>`;
 }
 function filterTx(){const q=(txSearch.value||'').toLowerCase(),b=txBank.value;document.querySelectorAll('#txTable tbody tr').forEach(r=>{r.style.display=(!q||r.textContent.toLowerCase().includes(q))&&(!b||r.children[3].textContent===b)?'':'none'})}
+
 function income(){
- const arr=state.transactions.filter(t=>t.type==='income'&&t.date.slice(0,7)===selectedMonth);
- return `<div class="page-head"><div><h1>Income 💚</h1><div class="hint">Track incoming money and exactly where it is stored.</div></div><div style="display:flex;gap:9px;align-items:center">${monthSelect()}<button class="btn primary" onclick="openIncome()">+ Add income</button></div></div>
- <section class="section"><div style="overflow:auto"><table><thead><tr><th>Date</th><th>Received from</th><th>Bank</th><th>Payment method</th><th>Category</th><th>Amount</th></tr></thead><tbody>${arr.map(txRow).join('')}</tbody></table></div>${!arr.length?`<div class="empty">No income for ${monthLabel(selectedMonth)}.</div>`:''}</section>`;
+  const arr=state.transactions.filter(t=>t.type==='income'&&t.date.slice(0,7)===selectedMonth);
+  return `<div class="page-head"><div><h1>Income 💚</h1><div class="hint">Track incoming money and exactly where it is stored.</div></div><div style="display:flex;gap:9px;align-items:center">${monthSelect()}<button class="btn primary" onclick="openIncome()">+ Add income</button></div></div>
+  <section class="section"><div style="overflow:auto"><table><thead><tr><th>Date</th><th>Received from</th><th>Bank</th><th>Payment method</th><th>Category</th><th>Amount</th><th></th></tr></thead><tbody>${arr.map(txRow).join('')}</tbody></table></div>${!arr.length?`<div class="empty">No income for ${monthLabel(selectedMonth)}.</div>`:''}</section>`;
 }
+
 function openIncome(){
- openModal('Add income',`<div class="form-grid">
- <div><label>Amount received</label><input id="iAmount" type="number" min="0" step=".01"></div>
- <div><label>Date</label><input id="iDate" type="date" value="${new Date().toISOString().slice(0,10)}"></div>
- <div><label>Received from</label><input id="iFrom" placeholder="Dad, Sister, Salary, Freelance"></div>
- <div><label>Bank — where money is stored</label><select id="iBank">${BANKS.map(b=>`<option>${b}</option>`).join('')}</select></div>
- <div><label>Payment method</label><select id="iMethod">${METHODS.map(m=>`<option>${m}</option>`).join('')}</select></div>
- <div><label>Category</label><select id="iCat">${state.categories.map(c=>`<option>${esc(c)}</option>`).join('')}</select></div>
- <div class="full"><button class="btn primary" onclick="saveIncome()">Save income</button></div>
- </div>`);
+  openModal('Add income',`<div class="form-grid">
+  <div><label>Amount received</label><input id="iAmount" type="number" min="0" step=".01"></div>
+  <div><label>Date</label><input id="iDate" type="date" value="${new Date().toISOString().slice(0,10)}"></div>
+  <div><label>Received from</label><input id="iFrom" placeholder="Dad, Sister, Salary, Freelance"></div>
+  <div><label>Bank — where money is stored</label><select id="iBank">${BANKS.map(b=>`<option>${b}</option>`).join('')}</select></div>
+  <div><label>Payment method</label><select id="iMethod">${METHODS.map(m=>`<option>${m}</option>`).join('')}</select></div>
+  <div><label>Category</label><select id="iCat">${state.categories.map(c=>`<option>${esc(c)}</option>`).join('')}</select></div>
+  <div class="full"><button class="btn primary" onclick="saveIncome()">Save income</button></div>
+  </div>`);
 }
-function saveIncome(){const amount=+iAmount.value,from=iFrom.value.trim();if(!amount||!from||!iDate.value){toast('Complete the required fields');return}state.transactions.push({id:crypto.randomUUID(),date:iDate.value,merchant:from,category:iCat.value,amount,type:'income',bank:iBank.value,paymentMethod:iMethod.value});save();closeModal();selectedMonth=iDate.value.slice(0,7);render();toast('Income added')}
+
+async function saveIncome(){
+  const amount=+iAmount.value,from=iFrom.value.trim();
+  if(!amount||!from||!iDate.value){toast('Complete the required fields');return}
+  await insertTransaction({date:iDate.value,merchant:from,category:iCat.value,amount,type:'income',bank:iBank.value,payment_method:iMethod.value});
+}
+
 function openExpense(){
- openModal('Add expense',`<div class="form-grid">
- <div><label>Amount spent</label><input id="eAmount" type="number" min="0" step=".01"></div>
- <div><label>Date</label><input id="eDate" type="date" value="${new Date().toISOString().slice(0,10)}"></div>
- <div><label>Merchant / source</label><input id="eMerchant" placeholder="Swiggy, Amazon, Uber..."></div>
- <div><label>Bank — money spent from</label><select id="eBank">${BANKS.map(b=>`<option>${b}</option>`).join('')}</select></div>
- <div><label>Payment method</label><select id="eMethod">${METHODS.map(m=>`<option>${m}</option>`).join('')}</select></div>
- <div><label>Category</label><select id="eCat">${state.categories.map(c=>`<option>${esc(c)}</option>`).join('')}</select></div>
- <div class="full"><button class="btn primary" onclick="saveExpense()">Save expense</button></div>
- </div>`);
+  openModal('Add expense',`<div class="form-grid">
+  <div><label>Amount spent</label><input id="eAmount" type="number" min="0" step=".01"></div>
+  <div><label>Date</label><input id="eDate" type="date" value="${new Date().toISOString().slice(0,10)}"></div>
+  <div><label>Merchant / source</label><input id="eMerchant" placeholder="Swiggy, Amazon, Uber..."></div>
+  <div><label>Bank — money spent from</label><select id="eBank">${BANKS.map(b=>`<option>${b}</option>`).join('')}</select></div>
+  <div><label>Payment method</label><select id="eMethod">${METHODS.map(m=>`<option>${m}</option>`).join('')}</select></div>
+  <div><label>Category</label><select id="eCat">${state.categories.map(c=>`<option>${esc(c)}</option>`).join('')}</select></div>
+  <div class="full"><button class="btn primary" onclick="saveExpense()">Save expense</button></div>
+  </div>`);
 }
-function saveExpense(){const amount=+eAmount.value,merchant=eMerchant.value.trim();if(!amount||!merchant||!eDate.value){toast('Complete the required fields');return}state.transactions.push({id:crypto.randomUUID(),date:eDate.value,merchant,category:eCat.value,amount,type:'expense',bank:eBank.value,paymentMethod:eMethod.value});save();closeModal();selectedMonth=eDate.value.slice(0,7);render();toast('Expense added')}
-function openCSV(){openModal('Import CSV',`<p class="hint">Use columns: date, merchant, amount, category, bank, payment_method. Positive amounts are income; negative amounts are expenses.</p><input id="csv" type="file" accept=".csv"><div style="margin-top:15px;text-align:right"><button class="btn primary" onclick="importCSV()">Import</button></div>`)}
+
+async function saveExpense(){
+  const amount=+eAmount.value,merchant=eMerchant.value.trim();
+  if(!amount||!merchant||!eDate.value){toast('Complete the required fields');return}
+  await insertTransaction({date:eDate.value,merchant,category:eCat.value,amount,type:'expense',bank:eBank.value,payment_method:eMethod.value});
+}
+
+async function insertTransaction(payload){
+  if(!currentUser){toast('Please sign in first');return}
+  const {data,error}=await sb.from('transactions').insert({
+    user_id:currentUser.id,
+    date:payload.date,
+    merchant:payload.merchant,
+    amount:Number(payload.amount),
+    type:payload.type,
+    category:payload.category,
+    bank:payload.bank,
+    payment_method:payload.payment_method,
+    notes:payload.notes||null
+  }).select().single();
+  if(error){console.error(error);toast('Could not save: '+error.message);return}
+  await loadTransactions();
+  closeModal();selectedMonth=payload.date.slice(0,7);render();toast(payload.type==='income'?'Income added':'Expense added');
+}
+
+async function loadTransactions(){
+  if(!currentUser)return;
+  const {data,error}=await sb.from('transactions').select('*').order('date',{ascending:false}).order('created_at',{ascending:false});
+  if(error){console.error(error);toast('Could not load your data: '+error.message);return}
+  state.transactions=(data||[]).map(r=>({
+    id:r.id,date:r.date,merchant:r.merchant,amount:Number(r.amount),type:r.type,category:r.category,
+    bank:r.bank,paymentMethod:r.payment_method,notes:r.notes,created_at:r.created_at,user_id:r.user_id
+  }));
+  updateSyncUI();
+}
+
+async function editTransaction(id){
+  const t=state.transactions.find(x=>Number(x.id)===Number(id));
+  if(!t)return;
+  openModal('Edit transaction',`<div class="form-grid">
+  <div><label>Amount</label><input id="xAmount" type="number" min="0" step=".01" value="${Number(t.amount)}"></div>
+  <div><label>Date</label><input id="xDate" type="date" value="${esc(t.date)}"></div>
+  <div><label>Source / Merchant</label><input id="xMerchant" value="${esc(t.merchant)}"></div>
+  <div><label>Bank</label><select id="xBank">${BANKS.map(b=>`<option ${b===t.bank?'selected':''}>${b}</option>`).join('')}</select></div>
+  <div><label>Payment method</label><select id="xMethod">${METHODS.map(m=>`<option ${m===t.paymentMethod?'selected':''}>${m}</option>`).join('')}</select></div>
+  <div><label>Category</label><select id="xCat">${state.categories.map(c=>`<option ${c===t.category?'selected':''}>${esc(c)}</option>`).join('')}</select></div>
+  <div><label>Type</label><select id="xType"><option value="expense" ${t.type==='expense'?'selected':''}>Expense</option><option value="income" ${t.type==='income'?'selected':''}>Income</option></select></div>
+  <div class="full"><button class="btn primary" onclick="updateTransaction(${Number(t.id)})">Save changes</button></div>
+  </div>`);
+}
+
+async function updateTransaction(id){
+  const {error}=await sb.from('transactions').update({
+    date:xDate.value,merchant:xMerchant.value.trim(),amount:+xAmount.value,bank:xBank.value,
+    payment_method:xMethod.value,category:xCat.value,type:xType.value
+  }).eq('id',id);
+  if(error){console.error(error);toast('Could not update: '+error.message);return}
+  await loadTransactions();closeModal();render();toast('Transaction updated');
+}
+
+async function deleteTransaction(id){
+  if(!confirm('Delete this transaction?'))return;
+  const {error}=await sb.from('transactions').delete().eq('id',id);
+  if(error){console.error(error);toast('Could not delete: '+error.message);return}
+  await loadTransactions();render();toast('Transaction deleted');
+}
+
+function openCSV(){
+  openModal('Import CSV',`<p class="hint">Columns: date, merchant, amount, category, bank, payment_method. Positive amounts are income; negative amounts are expenses. Bank values: HDFC, SBI, Punjab. Payment values: Google Pay, PhonePe, Cash, Account Transfer.</p><input id="csv" type="file" accept=".csv"><div style="margin-top:15px;text-align:right"><button class="btn primary" onclick="importCSV()">Import</button></div>`);
+}
 function parseCSVLine(line){const out=[];let cur='',quote=false;for(let i=0;i<line.length;i++){const c=line[i];if(c==='"'){if(quote&&line[i+1]==='"'){cur+='"';i++}else quote=!quote}else if(c===','&&!quote){out.push(cur.trim());cur=''}else cur+=c}out.push(cur.trim());return out}
-function importCSV(){const f=csv.files[0];if(!f){toast('Choose a CSV file');return}const reader=new FileReader();reader.onload=()=>{const lines=reader.result.split(/\r?\n/).filter(Boolean),head=parseCSVLine(lines.shift()).map(x=>x.toLowerCase());let n=0;for(const line of lines){const c=parseCSVLine(line),get=(names)=>{const i=head.findIndex(h=>names.includes(h));return i>=0?c[i]:''};const date=get(['date']),merchant=get(['merchant','description','source']),raw=(get(['amount'])||'').replace(/[₹,\s]/g,''),amount=parseFloat(raw);if(!date||!merchant||!Number.isFinite(amount)||amount===0)continue;const type=amount>0?'income':'expense';state.transactions.push({id:crypto.randomUUID(),date,merchant,category:get(['category'])||'Needs review',amount:Math.abs(amount),type,bank:get(['bank'])||'HDFC',paymentMethod:get(['payment_method','payment method','method'])||'Account Transfer'});n++}save();closeModal();if(lines.length)selectedMonth=state.transactions[state.transactions.length-1].date.slice(0,7);page='Transactions';renderNav();render();toast(n+' transaction(s) imported')};reader.readAsText(f)}
+
+async function importCSV(){
+  const f=csv.files[0];if(!f){toast('Choose a CSV file');return}
+  if(!currentUser){toast('Please sign in first');return}
+  const reader=new FileReader();
+  reader.onload=async()=>{
+    const lines=reader.result.split(/\r?\n/).filter(Boolean),head=parseCSVLine(lines.shift()).map(x=>x.toLowerCase());
+    const rows=[];
+    for(const line of lines){
+      const c=parseCSVLine(line),get=(names)=>{const i=head.findIndex(h=>names.includes(h));return i>=0?c[i]:''};
+      const date=get(['date']),merchant=get(['merchant','description','source']),raw=(get(['amount'])||'').replace(/[₹,\s]/g,''),amount=parseFloat(raw);
+      if(!date||!merchant||!Number.isFinite(amount)||amount===0)continue;
+      rows.push({
+        user_id:currentUser.id,date,merchant,category:get(['category'])||'Needs review',
+        amount:Math.abs(amount),type:amount>0?'income':'expense',
+        bank:get(['bank'])||'HDFC',payment_method:get(['payment_method','payment method','method'])||'Account Transfer',
+        notes:get(['notes'])||null
+      });
+    }
+    if(!rows.length){toast('No valid transactions found');return}
+    const {error}=await sb.from('transactions').insert(rows);
+    if(error){console.error(error);toast('Import failed: '+error.message);return}
+    await loadTransactions();closeModal();page='Transactions';renderNav();render();
+    toast(rows.length+' transaction(s) imported');
+  };
+  reader.readAsText(f);
+}
+
 function recurring(){return simpleList('Recurring','recurring')}
 function subscriptions(){return simpleList('Subscriptions','subscriptions')}
-function simpleList(title,key){const arr=state[key]||[];return `<div class="page-head"><div><h1>${title}</h1><div class="hint">Manage your ${title.toLowerCase()} manually.</div></div><button class="btn primary" onclick="simpleAdd('${key}')">+ Add</button></div><section class="section">${arr.length?arr.map((x,i)=>`<div class="statrow"><span><strong>${esc(x.name)}</strong><br><small>${money(x.amount)} · ${esc(x.cadence||'monthly')}</small></span><button class="btn" onclick="deleteSimple('${key}',${i})">Delete</button></div>`).join(''):`<div class="empty">Nothing added yet.</div>`}</section>`}
+function simpleList(title,key){const arr=state[key]||[];return `<div class="page-head"><div><h1>${title}</h1><div class="hint">These are currently device-local extras. Transactions are cloud-synced.</div></div><button class="btn primary" onclick="simpleAdd('${key}')">+ Add</button></div><section class="section">${arr.length?arr.map((x,i)=>`<div class="statrow"><span><strong>${esc(x.name)}</strong><br><small>${money(x.amount)} · ${esc(x.cadence||'monthly')}</small></span><button class="btn" onclick="deleteSimple('${key}',${i})">Delete</button></div>`).join(''):`<div class="empty">Nothing added yet.</div>`}</section>`}
 function simpleAdd(key){openModal('Add '+key,`<div class="form-grid"><div class="full"><label>Name</label><input id="sName"></div><div><label>Amount</label><input id="sAmount" type="number"></div><div><label>Cadence</label><select id="sCad"><option>monthly</option><option>weekly</option><option>quarterly</option><option>annual</option></select></div><div class="full"><button class="btn primary" onclick="saveSimple('${key}')">Save</button></div></div>`)}
-function saveSimple(key){const name=sName.value.trim(),amount=+sAmount.value||0;if(!name)return;state[key].push({name,amount,cadence:sCad.value});save();closeModal();render()}
-function deleteSimple(k,i){if(confirm('Delete this item?')){state[k].splice(i,1);save();render()}}
+function saveSimple(key){const name=sName.value.trim(),amount=+sAmount.value||0;if(!name)return;state[key].push({name,amount,cadence:sCad.value});render()}
+function deleteSimple(k,i){if(confirm('Delete this item?')){state[k].splice(i,1);render()}}
 function budgets(){return `<div class="page-head"><div><h1>Budgets</h1><div class="hint">Create monthly category limits.</div></div><button class="btn primary" onclick="simpleAdd('budgets')">+ Create budget</button></div><section class="section">${state.budgets.length?state.budgets.map((b,i)=>`<div class="statrow"><span>${esc(b.name)}</span><strong>${money(b.amount)}</strong></div>`).join(''):`<div class="empty">No budgets yet.</div>`}</section>`}
 function goals(){return `<div class="page-head"><div><h1>Goals</h1><div class="hint">Track savings targets.</div></div><button class="btn primary" onclick="simpleAdd('goals')">+ Create goal</button></div><section class="section">${state.goals.length?state.goals.map(g=>`<div class="statrow"><span>${esc(g.name)}</span><strong>${money(g.amount)}</strong></div>`).join(''):`<div class="empty">No goals yet.</div>`}</section>`}
-function documents(){return `<div class="page-head"><div><h1>Documents</h1><div class="hint">Manual-only document area. This dashboard is designed for laptop, iPhone and Android screens.</div></div></div><section class="section"><div class="empty">No documents yet. This standalone version does not connect to external storage.</div></section>`}
+function documents(){return `<div class="page-head"><div><h1>Documents</h1><div class="hint">Manual-only document area. This dashboard is designed for laptop, iPhone and Android screens.</div></div></div><section class="section"><div class="empty">No documents yet.</div></section>`}
 function rules(){return `<div class="page-head"><div><h1>Rules</h1><div class="hint">Optional manual rules.</div></div></div><section class="section"><div class="empty">No rules yet.</div></section>`}
-function settings(){return `<div class="page-head"><div><h1>Settings</h1><div class="hint">Your data stays in this browser.</div></div></div><section class="section"><h2>Net worth</h2><div class="form-grid"><div><label>Total assets</label><input id="assets" type="number" value="${state.settings.assets}"></div><div><label>Total liabilities</label><input id="liabilities" type="number" value="${state.settings.liabilities}"></div><div><button class="btn primary" onclick="saveNW()">Save</button></div></div></section><section class="section" style="margin-top:16px"><h2>Data</h2><button class="btn" onclick="backup()">Export backup</button> <button class="btn" onclick="resetAll()">Clear all transactions & data</button></section>`}
-function saveNW(){state.settings.assets=+assets.value||0;state.settings.liabilities=+liabilities.value||0;state.settings.netWorthConfigured=true;save();render();toast('Saved')}
-function backup(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(state,null,2)],{type:'application/json'}));a.download='my-finance-backup.json';a.click()}
-function resetAll(){if(confirm('Clear all transactions and personal data?')){state=freshState();save();render();toast('All data cleared')}}
-renderNav();render();
-</script>
-
-<script>
-if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+function settings(){
+  return `<div class="page-head"><div><h1>Settings</h1><div class="hint">Signed in as ${esc(currentUser?.email||'')}</div></div><button class="btn" onclick="logout()">Sign out</button></div>
+  <section class="section"><h2>Net worth</h2><div class="form-grid"><div><label>Total assets</label><input id="assets" type="number" value="${state.settings.assets}"></div><div><label>Total liabilities</label><input id="liabilities" type="number" value="${state.settings.liabilities}"></div><div><button class="btn primary" onclick="saveNW()">Save</button></div></div></section>
+  <section class="section" style="margin-top:16px"><h2>Data</h2><p class="hint">Transactions are stored securely in your SpendIt Supabase database and sync between devices when you sign in.</p><button class="btn" onclick="backup()">Export current transaction backup</button></section>`;
 }
+function saveNW(){state.settings.assets=+assets.value||0;state.settings.liabilities=+liabilities.value||0;state.settings.netWorthConfigured=true;render();toast('Saved on this device')}
+function backup(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(state.transactions,null,2)],{type:'application/json'}));a.download='spendit-transactions-backup.json';a.click()}
+
+function updateSyncUI(){
+  const chip=document.getElementById('userChip');
+  if(chip&&currentUser)chip.innerHTML='<span class="sync-dot"></span>Synced';
+}
+
+function showAuthError(msg){const el=document.getElementById('authError');el.textContent=msg;el.style.display='block'}
+function clearAuthError(){const el=document.getElementById('authError');el.style.display='none';el.textContent=''}
+async function login(){
+  clearAuthError();
+  const email=document.getElementById('loginEmail').value.trim();
+  const password=document.getElementById('loginPassword').value;
+  if(!email||!password){showAuthError('Enter your email and password.');return}
+  const btn=document.getElementById('loginBtn');btn.disabled=true;btn.textContent='Signing in...';
+  const {data,error}=await sb.auth.signInWithPassword({email,password});
+  btn.disabled=false;btn.textContent='Sign in';
+  if(error){showAuthError(error.message);return}
+  await enterApp(data.user);
+}
+async function logout(){await sb.auth.signOut()}
+async function enterApp(user){
+  currentUser=user;
+  document.getElementById('authScreen').style.display='none';
+  document.getElementById('userChip').innerHTML='<span class="sync-dot"></span>Syncing...';
+  await loadTransactions();
+  renderNav();render();
+  updateSyncUI();
+}
+sb.auth.onAuthStateChange(async(event,session)=>{
+  if(session?.user){
+    // Avoid doing heavy async work inside the auth callback itself.
+    setTimeout(()=>enterApp(session.user),0);
+  }else{
+    currentUser=null;
+    document.getElementById('authScreen').style.display='flex';
+    document.getElementById('loginPassword').value='';
+  }
+});
+
+(async()=>{
+  const {data:{session}}=await sb.auth.getSession();
+  if(session?.user) await enterApp(session.user);
+  else document.getElementById('authScreen').style.display='flex';
+})();
 </script>
 </body>
 </html>
