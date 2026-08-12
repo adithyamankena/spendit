@@ -437,24 +437,52 @@ function monthlyTransactions(){return state.transactions.filter(t=>t.date&&t.dat
 function totals(arr){const income=arr.filter(t=>t.type==='income').reduce((s,t)=>s+Number(t.amount),0),spend=arr.filter(t=>t.type==='expense').reduce((s,t)=>s+Number(t.amount),0);return {income,spend,rate:income?((income-spend)/income)*100:0}}
 
 function dashboard(){
-  const arr=state.transactions, nw=state.settings.netWorthConfigured?money(state.settings.assets-state.settings.liabilities):'Not set';
-  const t={income:Number(state.dashboardTotals.income)||0,spend:Number(state.dashboardTotals.spending)||0};
-  const rate=t.income?((t.income-t.spend)/t.income)*100:0;
+  const arr=monthlyTransactions();
+  const t=totals(arr);
+  const monthName=new Date(selectedMonth+'-01T00:00:00').toLocaleDateString('en-IN',{month:'long',year:'numeric'});
   const recent=[...arr].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5);
-  const cats={};arr.filter(x=>x.type==='expense').forEach(x=>cats[x.category]=(cats[x.category]||0)+Number(x.amount));
+
+  // Keep the existing dashboard charts unchanged; only the top summary is
+  // switched to the selected/current month's real transaction totals.
+  const allArr=state.transactions;
+  const cats={};
+  allArr.filter(x=>x.type==='expense').forEach(x=>cats[x.category]=(cats[x.category]||0)+Number(x.amount));
   const max=Math.max(...Object.values(cats),1);
+
   return `<div class="page-head"><div><h1>Your Data</h1><div class="hint">Private cloud-synced money snapshot</div></div></div>
-  <div class="cards">
-   <div class="card"><div class="label">NET WORTH</div><div class="value">${nw}</div><div class="hint">${nw==='Not set'?'Set it in Settings':'Assets minus liabilities'}</div></div>
-   <div class="card"><div class="label">TOTAL INCOME</div><div class="value">${money(t.income)}</div><div class="hint">Cumulative dashboard total</div></div>
-   <div class="card"><div class="label">TOTAL SPENDING</div><div class="value">${money(t.spend)}</div><div class="hint">Cumulative dashboard total</div></div>
-   <div class="card"><div class="label">SAVINGS RATE</div><div class="value">${rate.toFixed(1)}%</div><div class="hint">Based on dashboard totals</div></div>
-  </div>
+
+  <section class="section" style="margin-bottom:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+      <div>
+        <div class="label">THIS MONTH</div>
+        <h2 style="margin:4px 0 0">${monthName}</h2>
+      </div>
+      <div class="hint" style="font-weight:600">Income − Spending = Remaining</div>
+    </div>
+    <div class="cards" style="margin-top:14px">
+      <div class="card">
+        <div class="label">💰 INCOME</div>
+        <div class="value">${money(t.income)}</div>
+        <div class="hint">${monthName}</div>
+      </div>
+      <div class="card">
+        <div class="label">💸 SPENDING</div>
+        <div class="value">${money(t.spend)}</div>
+        <div class="hint">${monthName}</div>
+      </div>
+      <div class="card">
+        <div class="label">💚 REMAINING</div>
+        <div class="value">${money(t.income-t.spend)}</div>
+        <div class="hint">Income − Spending</div>
+      </div>
+    </div>
+  </section>
+
   <div class="grid2">
    <section class="section"><h2>Spending vibe 📊</h2>${Object.keys(cats).length?`<div class="bar-wrap">${Object.entries(cats).slice(0,7).map(([k,v])=>`<div class="bar" style="height:${Math.max(7,(v/max)*175)}px"><span>${esc(k)}</span></div>`).join('')}</div>`:`<div class="empty">No spending data yet.<br>Add an expense to start your dashboard.</div>`}</section>
    <section class="section"><h2>Top spending</h2>${Object.keys(cats).length?Object.entries(cats).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([k,v])=>`<div class="statrow"><span>${esc(k)}</span><strong>${money(v)}</strong></div>`).join(''):`<div class="empty">Nothing to show yet.</div>`}</section>
   </div>
-  <section class="section" style="margin-top:16px"><h2>Recent activity</h2>${recent.length?`<div style="overflow:auto"><table><thead><tr><th>Date</th><th>Source / Merchant</th><th>Category</th><th>Bank</th><th>Payment method</th><th>Amount</th><th></th></tr></thead><tbody>${recent.map(txRow).join('')}</tbody></table></div>`:`<div class="empty">No transactions yet. Use <b style="margin:0 4px">+ Add income</b> or <b style="margin-left:4px">+ Add expense</b>.</div>`}</section>`;
+  <section class="section" style="margin-top:16px"><h2>Recent activity</h2>${recent.length?`<div style="overflow:auto"><table><thead><tr><th>Date</th><th>Source / Merchant</th><th>Category</th><th>Bank</th><th>Payment method</th><th>Amount</th><th></th></tr></thead><tbody>${recent.map(txRow).join('')}</tbody></table></div>`:`<div class="empty">No transactions recorded for ${monthName}. Use <b style="margin:0 4px">+ Add income</b> or <b style="margin-left:4px">+ Add expense</b>.</div>`}</section>`;
 }
 
 function txRow(t){
