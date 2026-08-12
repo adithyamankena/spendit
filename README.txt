@@ -1,11 +1,13 @@
-SPENDIT V13 — CATEGORIES + NOTE ONLY
+SPENDIT V14 — ACTIONS-ONLY TOP BAR
 
-Requested changes:
-- Add Car Loan, Fuel, Chitti, Funds to Add Income/Add Expense categories.
-- Remove Housing and Needs review.
-- Add a Note text box to Add Income and Add Expense for describing what the entry is for.
+Based on working v13.
 
-Everything else remains based on the working v12 version.
+Requested change only:
+- Remove the top Your Data title, mobile SpendIt title, and Auto-synced chip from the top bar.
+- Keep only Import CSV, + Add income, and + Add expense in the top action bar on every page.
+- The separate dashboard Your Data heading/content remains unchanged.
+
+No database, Supabase, authentication, sync, transaction, category, or note behavior changed.
 Do not run Supabase SQL again.
 
 Upload/replace only:
