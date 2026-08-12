@@ -994,6 +994,298 @@ select,input,textarea{
 }
 </style>
 
+
+<style>
+/* Change 7 FIXED3 — actual cause of the "empty space" fixed */
+
+/* The dashboard's .grid2 CSS grid was stretching both panels to the
+   height of the taller panel. This made Cash flow contain a large
+   blank area. Align each panel to its own content height. */
+.grid2{
+  align-items:start!important;
+  margin-top:8px!important;
+  gap:10px!important;
+}
+.grid2 > .section{
+  align-self:start!important;
+  height:auto!important;
+  min-height:0!important;
+}
+
+/* Cash-flow chart should occupy only the space it actually needs. */
+.grid2 .bar-wrap{
+  height:205px!important;
+  min-height:0!important;
+  padding:12px 8px 28px!important;
+}
+
+/* The spending breakdown should also size to content rather than
+   forcing the neighboring chart panel taller. */
+.grid2 .spend-breakdown{
+  min-height:0!important;
+  align-items:center!important;
+}
+.grid2 .spend-donut-wrap{
+  min-height:0!important;
+  height:184px!important;
+}
+
+/* Remove extra margins between the main dashboard blocks. */
+#content > .page-head{
+  margin-bottom:7px!important;
+}
+#content > section.section[style]{
+  margin-bottom:8px!important;
+}
+#content > .grid2{
+  margin-bottom:8px!important;
+}
+#content > section.section:last-child{
+  margin-top:8px!important;
+}
+
+/* Keep the requested palette and black text. */
+body{
+  background:#EEF2F0!important;
+  color:#000000!important;
+}
+body *{
+  --text:#000000;
+}
+.hint,.label,th{
+  color:#000000!important;
+  opacity:.62;
+}
+.card,.section,.topbar.actions-only,.sidebar{
+  background:rgba(255,255,255,.70)!important;
+  border-color:rgba(255,255,255,.80)!important;
+  box-shadow:0 12px 32px rgba(0,0,0,.08),inset 0 1px 0 rgba(255,255,255,.95)!important;
+  backdrop-filter:blur(24px) saturate(145%)!important;
+  -webkit-backdrop-filter:blur(24px) saturate(145%)!important;
+}
+
+/* Mobile: stack naturally; never create artificial equal-height rows. */
+@media(max-width:900px){
+  .grid2{
+    align-items:start!important;
+  }
+}
+@media(max-width:700px){
+  .grid2{
+    gap:7px!important;
+    margin-top:6px!important;
+    margin-bottom:6px!important;
+  }
+  .grid2 .bar-wrap{
+    height:175px!important;
+    padding:10px 6px 26px!important;
+  }
+  .grid2 .spend-donut-wrap{
+    height:170px!important;
+  }
+}
+</style>
+
+
+<style>
+/* =========================================================
+   Change 7 FIXED4
+   Final dashboard card sizing — remove the visible dead area
+   inside the Cash flow panel.
+   ========================================================= */
+
+/* Desktop dashboard row */
+#content > .grid2{
+  display:grid!important;
+  grid-template-columns:minmax(0,1.25fr) minmax(360px,.75fr)!important;
+  align-items:start!important;
+  gap:10px!important;
+}
+
+/* Cash-flow card: explicitly sized to the content it displays.
+   This prevents the browser from leaving a large stretched panel. */
+#content > .grid2 > .section:first-child{
+  height:285px!important;
+  min-height:285px!important;
+  max-height:285px!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+}
+
+/* Spending breakdown card */
+#content > .grid2 > .section:nth-child(2){
+  height:300px!important;
+  min-height:300px!important;
+  max-height:300px!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+}
+
+/* The chart itself is smaller so the card contains only the useful
+   visual information instead of a tall empty lower half. */
+#content > .grid2 > .section:first-child .bar-wrap{
+  height:165px!important;
+  padding:8px 8px 27px!important;
+  box-sizing:border-box!important;
+}
+
+/* Keep the spending donut/list compact */
+#content > .grid2 > .section:nth-child(2) .spend-breakdown{
+  height:238px!important;
+  grid-template-columns:190px minmax(0,1fr)!important;
+  gap:14px!important;
+}
+#content > .grid2 > .section:nth-child(2) .spend-donut-wrap{
+  height:184px!important;
+  min-height:184px!important;
+}
+#content > .grid2 > .section:nth-child(2) .spend-donut{
+  width:174px!important;
+  height:174px!important;
+}
+#content > .grid2 > .section:nth-child(2) .spend-row{
+  padding:7px 0!important;
+}
+#content > .grid2 > .section:nth-child(2) .spend-track{
+  height:6px!important;
+  margin-top:5px!important;
+}
+
+/* Remove the extra top/bottom spacing around this row */
+#content > .grid2{
+  margin-top:8px!important;
+  margin-bottom:8px!important;
+}
+
+/* Black text + requested glass palette */
+body{
+  background:#EEF2F0!important;
+  color:#000000!important;
+}
+#content,#content h1,#content h2,#content h3,
+#content .value,#content .label,#content .hint,
+#content p,#content th,#content td{
+  color:#000000!important;
+}
+#content .hint,#content .label,#content th{
+  opacity:.64;
+}
+.card,.section,.topbar.actions-only,.sidebar{
+  background:rgba(255,255,255,.70)!important;
+  border-color:rgba(255,255,255,.80)!important;
+  box-shadow:0 12px 32px rgba(0,0,0,.08),inset 0 1px 0 rgba(255,255,255,.95)!important;
+  backdrop-filter:blur(24px) saturate(145%)!important;
+  -webkit-backdrop-filter:blur(24px) saturate(145%)!important;
+}
+
+/* Mobile: don't force desktop heights; stack naturally. */
+@media(max-width:700px){
+  #content > .grid2{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    gap:7px!important;
+  }
+  #content > .grid2 > .section:first-child,
+  #content > .grid2 > .section:nth-child(2){
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow:hidden!important;
+  }
+  #content > .grid2 > .section:first-child .bar-wrap{
+    height:175px!important;
+    padding:8px 6px 26px!important;
+  }
+  #content > .grid2 > .section:nth-child(2) .spend-breakdown{
+    height:auto!important;
+    display:block!important;
+  }
+  #content > .grid2 > .section:nth-child(2) .spend-donut-wrap{
+    display:none!important;
+  }
+}
+</style>
+
+
+<style>
+/* Change 7 FIXED5 — fix the ACTUAL sidebar-to-content horizontal gap */
+
+/* Sidebar occupies: left 18px + width 235px = 253px.
+   Start the main content immediately after it with a small 12px gutter. */
+.main{
+  margin-left:265px!important;
+  width:calc(100% - 265px)!important;
+  box-sizing:border-box!important;
+  padding:12px 14px 24px!important;
+}
+
+/* Do NOT center a max-width content wrapper.
+   The previous max-width:1500px + margin:auto was creating the
+   large blank area marked in the screenshot. */
+.content{
+  width:100%!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:14px 0 20px!important;
+  box-sizing:border-box!important;
+}
+
+/* Header and dashboard now use the full available main area. */
+.topbar{
+  width:100%!important;
+  box-sizing:border-box!important;
+}
+#content{
+  width:100%!important;
+  box-sizing:border-box!important;
+}
+
+/* Keep the dashboard cards tight and full-width. */
+#content > .section,
+#content > .grid2{
+  width:100%!important;
+  box-sizing:border-box!important;
+}
+
+/* Requested visual palette */
+body{
+  background:#EEF2F0!important;
+  color:#000000!important;
+}
+#content h1,#content h2,#content h3,
+#content p,#content .value,#content .label,
+#content .hint,#content th,#content td{
+  color:#000000!important;
+}
+#content .hint,#content .label,#content th{opacity:.64}
+
+/* Glass */
+.topbar.actions-only,
+.sidebar,
+.card,
+.section{
+  background:rgba(255,255,255,.70)!important;
+  border-color:rgba(255,255,255,.80)!important;
+  box-shadow:0 12px 32px rgba(0,0,0,.08),inset 0 1px 0 rgba(255,255,255,.95)!important;
+  backdrop-filter:blur(24px) saturate(145%)!important;
+  -webkit-backdrop-filter:blur(24px) saturate(145%)!important;
+}
+
+/* Mobile overrides: sidebar disappears, so main returns to full width. */
+@media(max-width:700px){
+  .main{
+    margin-left:0!important;
+    width:100%!important;
+    padding:7px 8px 96px!important;
+  }
+  .content{
+    width:100%!important;
+    max-width:none!important;
+    padding:8px 2px 12px!important;
+  }
+}
+</style>
+
 </head>
 <body>
 
