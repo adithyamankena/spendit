@@ -327,6 +327,22 @@ button,a,select,input{touch-action:manipulation}
 }
 </style>
 
+
+<style>
+/* SpendIt V20 polish layer */
+.page-tools{display:flex;align-items:center;gap:9px;flex-wrap:wrap;justify-content:flex-end}
+.section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.section-title h2{margin:0}
+.summary-cards{grid-template-columns:repeat(4,1fr)}
+.value.negative{color:var(--red)}
+.donut-layout{display:grid;grid-template-columns:210px 1fr;align-items:center;gap:22px}.donut{width:210px;height:210px;border-radius:50%;display:grid;place-items:center;box-shadow:0 0 45px rgba(102,133,255,.12)}.donut-hole{width:122px;height:122px;border-radius:50%;background:rgba(14,17,30,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}.donut-hole strong{font-size:18px}.donut-hole span{font-size:11px;color:var(--muted);margin-top:3px}.legend{display:flex;flex-direction:column;gap:9px}.legend-row{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px}.legend-row span{display:flex;align-items:center;gap:8px}.legend-row i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.flow-row{display:grid;grid-template-columns:38px 1fr 82px;gap:9px;align-items:center;margin:13px 0;font-size:11px}.flow-bars{display:flex;flex-direction:column;gap:4px}.flow-bars i{display:block;height:6px;border-radius:99px;min-width:2px}.flow-income{background:var(--green)}.flow-spend{background:var(--pink)}.flow-row small{text-align:right;color:var(--muted)}.flow-legend{display:flex;gap:16px;color:var(--muted);font-size:10px;margin-top:10px}.flow-legend span{display:flex;align-items:center;gap:5px}.flow-legend i{width:10px;height:6px;border-radius:99px;display:inline-block}.account-row,.commit-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}.account-row:last-child,.commit-row:last-child{border-bottom:0}.account-row div:first-child,.commit-row div:first-child{display:flex;flex-direction:column;gap:3px}.account-row small,.commit-row small{color:var(--muted);font-size:10px}.account-row div:last-child{display:flex;gap:12px;font-size:11px}.commit-row>strong{display:flex;flex-direction:column;align-items:flex-end;gap:2px}.compact{min-height:120px}
+.tx-item{border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.035);border-radius:15px;margin:8px 0;overflow:hidden}.tx-item summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 15px;cursor:pointer}.tx-item summary::-webkit-details-marker{display:none}.tx-item summary:hover{background:rgba(255,255,255,.045)}.tx-main{display:flex;flex-direction:column;gap:4px;min-width:0}.tx-title{font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.tx-meta{color:var(--muted);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.tx-amount{font-weight:900;white-space:nowrap}.tx-detail{padding:0 15px 15px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;border-top:1px solid var(--line)}.tx-detail>div{padding-top:12px}.tx-detail span,.tx-note>span{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}.tx-detail strong{font-size:12px}.tx-note{grid-column:1/-1;border-top:1px dashed var(--line);margin-top:2px}.tx-note div{font-size:12px;line-height:1.5;color:var(--text)}
+.filter-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:9px;margin-bottom:15px}.quick-title{font-size:11px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px}.quick-chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px}.quick-chip{border:1px solid var(--line);background:rgba(255,255,255,.055);color:var(--text);border-radius:999px;padding:8px 11px;font-weight:750;font-size:12px}.quick-chip:hover,.quick-chip.selected{background:rgba(102,133,255,.18);border-color:rgba(102,133,255,.45)}.data-actions{display:flex;gap:9px;flex-wrap:wrap}.theme-row{display:flex;gap:10px}.theme-option{border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);padding:12px 16px;border-radius:13px;font-weight:800}.theme-option.selected{border-color:var(--blue);box-shadow:0 0 0 2px rgba(102,133,255,.12);background:rgba(102,133,255,.14)}.lifetime-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.lifetime-grid>div{padding:12px;border-radius:14px;background:rgba(255,255,255,.04);display:flex;flex-direction:column;gap:5px}.lifetime-grid span{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}.lifetime-grid strong{font-size:15px}
+html.theme-light{--bg:#eef2fb;--bg2:#f8faff;--card:rgba(255,255,255,.78);--card2:rgba(255,255,255,.94);--text:#172033;--muted:#657089;--line:rgba(28,42,70,.13)}.theme-light body{background:radial-gradient(circle at 10% 0%,rgba(89,225,255,.16),transparent 30%),radial-gradient(circle at 90% 10%,rgba(255,103,199,.13),transparent 28%),linear-gradient(135deg,#eef2fb 0%,#f8faff 55%,#edf1f9 100%)}.theme-light .sidebar,.theme-light .topbar,.theme-light .card,.theme-light .section{background:linear-gradient(145deg,rgba(255,255,255,.86),rgba(255,255,255,.64));border-color:rgba(28,42,70,.12);box-shadow:0 18px 45px rgba(45,60,90,.10),inset 0 1px rgba(255,255,255,.8)}.theme-light .nav button{color:#5e6880}.theme-light .nav button.active{color:#172033;background:linear-gradient(100deg,rgba(89,225,255,.19),rgba(118,87,255,.16),rgba(255,103,199,.13))}.theme-light .btn,.theme-light input,.theme-light select,.theme-light .quick-chip,.theme-light .theme-option{background:rgba(255,255,255,.72);color:var(--text);border-color:rgba(28,42,70,.13)}.theme-light select option{background:#fff;color:#172033}.theme-light .tx-item{background:rgba(255,255,255,.58);border-color:rgba(28,42,70,.10)}.theme-light .donut-hole{background:rgba(248,250,255,.94)}.theme-light .mobile-nav{background:rgba(255,255,255,.82);border-color:rgba(28,42,70,.13)}
+@media(max-width:900px){.summary-cards{grid-template-columns:repeat(2,1fr)}.donut-layout{grid-template-columns:180px 1fr}.donut{width:180px;height:180px}.filter-grid{grid-template-columns:1fr 1fr}.lifetime-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.page-tools{width:100%;justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px}.page-tools .btn,.page-tools .period{flex:0 0 auto}.summary-cards{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:3px;scrollbar-width:none}.summary-cards::-webkit-scrollbar{display:none}.summary-cards .card{min-width:74vw;scroll-snap-align:start}.donut-layout{grid-template-columns:1fr;justify-items:center}.donut{width:185px;height:185px}.legend{width:100%}.filter-grid{grid-template-columns:1fr 1fr}.filter-grid input{grid-column:1/-1}.tx-detail{grid-template-columns:1fr 1fr}.lifetime-grid{grid-template-columns:1fr 1fr}.data-actions{flex-direction:column}.data-actions .btn{width:100%}.account-row div:last-child{flex-direction:column;gap:4px;text-align:right}}
+@media(max-width:430px){.summary-cards .card{min-width:82vw}.filter-grid{grid-template-columns:1fr}.filter-grid input{grid-column:auto}.tx-item summary{padding:13px}.tx-title{max-width:54vw}.tx-detail{grid-template-columns:1fr 1fr}.lifetime-grid{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
 
@@ -403,9 +419,11 @@ let state = {
 };
 let page='Dashboard';
 let selectedMonth=new Date().toISOString().slice(0,7);
+applyThemeSafe();
 let currentUser=null;
 let enteringUserId=null;
 
+function applyThemeSafe(){document.documentElement.classList.toggle('theme-light',localStorage.getItem('spendit_theme')==='light')}
 function money(n){return new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:2}).format(Number(n)||0)}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
@@ -421,331 +439,191 @@ function renderNav(){
 }
 function go(p){page=p;renderNav();render();window.scrollTo({top:0,behavior:'smooth'})}
 function render(){
-  const fn={Dashboard:dashboard,Transactions:transactions,Income:income,Recurring:recurring,Subscriptions:subscriptions,Budgets:budgets,Goals:goals,Documents:documents,Rules:rules,Settings:settings}[page];
+  const fn={Dashboard:dashboard,Transactions:transactions,Income:income,Settings:settings}[page]||dashboard;
   content.innerHTML=fn();
+  applyTheme();
 }
+
+let selectedPeriod='month';
 function periodOptions(){
   const months={};
   state.transactions.forEach(t=>{if(t.date)months[t.date.slice(0,7)]=1});
-  const now=new Date();months[now.toISOString().slice(0,7)]=1;
-  for(let i=1;i<12;i++){const d=new Date(now.getFullYear(),now.getMonth()-i,1);months[d.toISOString().slice(0,7)]=1}
+  const now=new Date();
+  months[now.toISOString().slice(0,7)]=1;
+  for(let i=1;i<18;i++){const d=new Date(now.getFullYear(),now.getMonth()-i,1);months[d.toISOString().slice(0,7)]=1}
   return Object.keys(months).sort().reverse();
 }
-function monthLabel(k){const [y,m]=k.split('-');return new Date(+y,+m-1,1).toLocaleDateString('en-IN',{month:'long',year:'numeric'})}
-function monthSelect(){return `<select class="period" onchange="selectedMonth=this.value;render()">${periodOptions().map(m=>`<option value="${m}" ${m===selectedMonth?'selected':''}>${monthLabel(m)}</option>`).join('')}</select>`}
-function monthlyTransactions(){return state.transactions.filter(t=>t.date&&t.date.slice(0,7)===selectedMonth).sort((a,b)=>b.date.localeCompare(a.date))}
-function totals(arr){const income=arr.filter(t=>t.type==='income').reduce((s,t)=>s+Number(t.amount),0),spend=arr.filter(t=>t.type==='expense').reduce((s,t)=>s+Number(t.amount),0);return {income,spend,rate:income?((income-spend)/income)*100:0}}
-
+function monthLabel(k){
+  if(k==='all')return 'All time';
+  const [y,m]=k.split('-');
+  return new Date(+y,+m-1,1).toLocaleDateString('en-IN',{month:'long',year:'numeric'});
+}
+function selectedKey(){return selectedPeriod==='all'?'all':selectedMonth}
+function periodSelect(){
+  const opts=[`<option value="all" ${selectedPeriod==='all'?'selected':''}>All time</option>`]
+    .concat(periodOptions().map(m=>`<option value="${m}" ${selectedPeriod==='month'&&m===selectedMonth?'selected':''}>${monthLabel(m)}</option>`));
+  return `<select class="period" aria-label="Select period" onchange="setSelectedPeriod(this.value)">${opts.join('')}</select>`;
+}
+function setSelectedPeriod(v){
+  if(v==='all'){selectedPeriod='all'}else{selectedPeriod='month';selectedMonth=v}
+  render();
+}
+function periodTransactions(){
+  return selectedPeriod==='all' ? [...state.transactions] : state.transactions.filter(t=>t.date&&t.date.slice(0,7)===selectedMonth);
+}
+function monthlyTransactions(){return periodTransactions().sort((a,b)=>b.date.localeCompare(a.date))}
+function totals(arr){
+  const income=arr.filter(t=>t.type==='income').reduce((s,t)=>s+Number(t.amount),0);
+  const spend=arr.filter(t=>t.type==='expense').reduce((s,t)=>s+Number(t.amount),0);
+  return {income,spend,remaining:income-spend,rate:income?((income-spend)/income)*100:0};
+}
+function periodLabel(){return selectedPeriod==='all'?'All time':monthLabel(selectedMonth)}
+function donutStyle(cats){
+  const entries=Object.entries(cats).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const total=entries.reduce((s,[,v])=>s+v,0);
+  if(!total)return 'conic-gradient(rgba(255,255,255,.08) 0 100%)';
+  let cursor=0;const stops=[];
+  entries.forEach(([,v],i)=>{const next=cursor+(v/total)*100;stops.push(`${DONUT_COLORS[i%DONUT_COLORS.length]} ${cursor}% ${next}%`);cursor=next});
+  return `conic-gradient(${stops.join(',')})`;
+}
+const DONUT_COLORS=['#59e1ff','#6685ff','#ff67c7','#52e0a4','#ffb45c','#ff6b7a','#a78bfa','#7dd3fc'];
+function categoryTotals(arr){
+  const cats={};
+  arr.filter(x=>x.type==='expense').forEach(x=>cats[x.category||'Other']=(cats[x.category||'Other']||0)+Number(x.amount));
+  return cats;
+}
+function cashFlowData(){
+  const now=new Date();
+  return Array.from({length:7},(_,idx)=>{
+    const d=new Date(now.getFullYear(),now.getMonth()-(6-idx),1),key=d.toISOString().slice(0,7);
+    const arr=state.transactions.filter(t=>t.date&&t.date.slice(0,7)===key);
+    const t=totals(arr);
+    return {key,label:d.toLocaleDateString('en-IN',{month:'short'}),income:t.income,spend:t.spend};
+  });
+}
+function commitmentPatterns(){
+  const groups={};
+  state.transactions.filter(t=>t.type==='expense'&&t.date).forEach(t=>{
+    const key=(t.merchant||t.category||'Other').trim().toLowerCase();
+    if(!groups[key])groups[key]={name:t.merchant||t.category||'Other',category:t.category||'Other',months:new Set(),amounts:[]};
+    groups[key].months.add(t.date.slice(0,7));groups[key].amounts.push(Number(t.amount)||0);
+  });
+  return Object.values(groups).filter(g=>g.months.size>=2).map(g=>({...g,avg:g.amounts.reduce((a,b)=>a+b,0)/g.amounts.length})).sort((a,b)=>b.avg-a.avg).slice(0,5);
+}
+function accountActivity(){
+  const period=periodTransactions();
+  return BANKS.map(bank=>{
+    const arr=period.filter(t=>t.bank===bank);
+    const income=arr.filter(t=>t.type==='income').reduce((s,t)=>s+Number(t.amount),0);
+    const spend=arr.filter(t=>t.type==='expense').reduce((s,t)=>s+Number(t.amount),0);
+    return {bank,income,spend,count:arr.length};
+  });
+}
+function txDetails(t){
+  const note=t.notes?`<div class="tx-note"><span>Note</span><div>${esc(t.notes)}</div></div>`:'';
+  return `<details class="tx-item" data-search="${esc([t.date,t.merchant,t.category,t.bank,t.paymentMethod,t.notes||'',t.type].join(' ').toLowerCase())}" data-bank="${esc(t.bank||'')}" data-type="${esc(t.type)}" data-category="${esc(t.category||'')}">
+    <summary><span class="tx-main"><span class="tx-title">${esc(t.merchant)}</span><span class="tx-meta">${esc(t.date)} · ${esc(t.category||'Other')} · ${esc(t.bank||'—')}</span></span><span class="tx-amount ${t.type}">${t.type==='income'?'+':'−'}${money(t.amount)}</span></summary>
+    <div class="tx-detail"><div><span>Category</span><strong>${esc(t.category||'Other')}</strong></div><div><span>Bank</span><strong>${esc(t.bank||'—')}</strong></div><div><span>Payment</span><strong>${esc(t.paymentMethod||'—')}</strong></div><div><span>Type</span><strong>${t.type==='income'?'Income':'Expense'}</strong></div>${note}</div>
+  </details>`;
+}
 function dashboard(){
-  const arr=state.transactions, nw=state.settings.netWorthConfigured?money(state.settings.assets-state.settings.liabilities):'Not set';
-  const t={income:Number(state.dashboardTotals.income)||0,spend:Number(state.dashboardTotals.spending)||0};
-  const rate=t.income?((t.income-t.spend)/t.income)*100:0;
-  const recent=[...arr].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5);
-  const cats={};arr.filter(x=>x.type==='expense').forEach(x=>cats[x.category]=(cats[x.category]||0)+Number(x.amount));
-  const max=Math.max(...Object.values(cats),1);
-  return `<div class="page-head"><div><h1>Your Data</h1><div class="hint">Private cloud-synced money snapshot</div></div></div>
-  <div class="cards">
-   <div class="card"><div class="label">NET WORTH</div><div class="value">${nw}</div><div class="hint">${nw==='Not set'?'Set it in Settings':'Assets minus liabilities'}</div></div>
-   <div class="card"><div class="label">TOTAL INCOME</div><div class="value">${money(t.income)}</div><div class="hint">Cumulative dashboard total</div></div>
-   <div class="card"><div class="label">TOTAL SPENDING</div><div class="value">${money(t.spend)}</div><div class="hint">Cumulative dashboard total</div></div>
-   <div class="card"><div class="label">SAVINGS RATE</div><div class="value">${rate.toFixed(1)}%</div><div class="hint">Based on dashboard totals</div></div>
+  const arr=periodTransactions(),t=totals(arr),cats=categoryTotals(arr),entries=Object.entries(cats).sort((a,b)=>b[1]-a[1]),flow=cashFlowData(),accounts=accountActivity(),commitments=commitmentPatterns();
+  const nw=state.settings.netWorthConfigured?money(state.settings.assets-state.settings.liabilities):'Not set';
+  const lifetime=totals(state.transactions);
+  const maxFlow=Math.max(...flow.flatMap(x=>[x.income,x.spend]),1);
+  return `<div class="page-head"><div><h1>Your Data</h1><div class="hint">A clearer view of ${esc(periodLabel().toLowerCase())}</div></div><div class="page-tools">${periodSelect()}</div></div>
+  <div class="cards summary-cards">
+    <div class="card"><div class="label">INCOME</div><div class="value">${money(t.income)}</div><div class="hint">${esc(periodLabel())}</div></div>
+    <div class="card"><div class="label">SPENDING</div><div class="value">${money(t.spend)}</div><div class="hint">${esc(periodLabel())}</div></div>
+    <div class="card"><div class="label">REMAINING</div><div class="value ${t.remaining<0?'negative':''}">${money(t.remaining)}</div><div class="hint">Income − spending</div></div>
+    <div class="card"><div class="label">SAVINGS RATE</div><div class="value">${t.rate.toFixed(1)}%</div><div class="hint">Based on selected period</div></div>
   </div>
-  <div class="grid2">
-   <section class="section"><h2>Spending vibe 📊</h2>${Object.keys(cats).length?`<div class="bar-wrap">${Object.entries(cats).slice(0,7).map(([k,v])=>`<div class="bar" style="height:${Math.max(7,(v/max)*175)}px"><span>${esc(k)}</span></div>`).join('')}</div>`:`<div class="empty">No spending data yet.<br>Add an expense to start your dashboard.</div>`}</section>
-   <section class="section"><h2>Top spending</h2>${Object.keys(cats).length?Object.entries(cats).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([k,v])=>`<div class="statrow"><span>${esc(k)}</span><strong>${money(v)}</strong></div>`).join(''):`<div class="empty">Nothing to show yet.</div>`}</section>
+  <div class="grid2 dashboard-main">
+    <section class="section"><div class="section-title"><h2>Where did my money go?</h2><span class="pill">${money(t.spend)}</span></div>${entries.length?`<div class="donut-layout"><div class="donut" style="background:${donutStyle(cats)}"><div class="donut-hole"><strong>${money(t.spend)}</strong><span>spent</span></div></div><div class="legend">${entries.slice(0,8).map(([k,v],i)=>`<div class="legend-row"><span><i style="background:${DONUT_COLORS[i%DONUT_COLORS.length]}"></i>${esc(k)}</span><strong>${money(v)}</strong></div>`).join('')}</div></div>`:`<div class="empty">No spending data for this period.<br>Add an expense to start your breakdown.</div>`}</section>
+    <section class="section"><div class="section-title"><h2>7-month cash flow</h2><span class="hint">Income vs spending</span></div>${flow.map(x=>`<div class="flow-row"><span>${x.label}</span><div class="flow-bars"><i class="flow-income" style="width:${Math.max(2,(x.income/maxFlow)*100)}%"></i><i class="flow-spend" style="width:${Math.max(2,(x.spend/maxFlow)*100)}%"></i></div><small>${money(x.income-x.spend)}</small></div>`).join('')}<div class="flow-legend"><span><i class="flow-income"></i>Income</span><span><i class="flow-spend"></i>Spending</span></div></section>
   </div>
-  <section class="section" style="margin-top:16px"><h2>Recent activity</h2>${recent.length?`<div style="overflow:auto"><table><thead><tr><th>Date</th><th>Source / Merchant</th><th>Category</th><th>Bank</th><th>Payment method</th><th>Amount</th><th></th></tr></thead><tbody>${recent.map(txRow).join('')}</tbody></table></div>`:`<div class="empty">No transactions yet. Use <b style="margin:0 4px">+ Add income</b> or <b style="margin-left:4px">+ Add expense</b>.</div>`}</section>`;
+  <div class="grid2 dashboard-secondary">
+    <section class="section"><div class="section-title"><h2>Account activity</h2><span class="hint">Transaction-derived</span></div>${accounts.map(a=>`<div class="account-row"><div><strong>${a.bank}</strong><small>${a.count} transaction${a.count===1?'':'s'}</small></div><div><span class="income">+${money(a.income)}</span><span class="expense">−${money(a.spend)}</span></div></div>`).join('')}</section>
+    <section class="section"><div class="section-title"><h2>Monthly commitments</h2><span class="hint">Patterns only</span></div>${commitments.length?commitments.map(c=>`<div class="commit-row"><div><strong>${esc(c.name)}</strong><small>${esc(c.category)} · ${c.months.size} months</small></div><strong>${money(c.avg)}<small>avg</small></strong></div>`).join(''):`<div class="empty compact">Recurring patterns will appear after the same payment shows up in at least two months.</div>`}</section>
+  </div>
+  <section class="section" style="margin-top:16px"><div class="section-title"><h2>Recent activity</h2><span class="hint">Tap any item for details</span></div>${state.transactions.length?[...state.transactions].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5).map(txDetails).join(''):`<div class="empty">No transactions yet.</div>`}</section>
+  <section class="section lifetime" style="margin-top:16px"><div class="section-title"><h2>Lifetime snapshot</h2><span class="hint">All synced transactions</span></div><div class="lifetime-grid"><div><span>Income</span><strong>${money(lifetime.income)}</strong></div><div><span>Spending</span><strong>${money(lifetime.spend)}</strong></div><div><span>Remaining</span><strong>${money(lifetime.remaining)}</strong></div><div><span>Net worth</span><strong>${nw}</strong></div></div></section>`;
 }
-
-function txRow(t){
-  const sign=t.type==='income'?'+':'−';
-  return `<tr><td>${esc(t.date)}</td><td>${esc(t.merchant)}</td><td>${esc(t.category)}</td><td>${esc(t.bank||'—')}</td><td>${esc(t.paymentMethod||'—')}</td><td class="${t.type}">${sign}${money(t.amount)}</td><td></td></tr>`;
-}
-
 function transactions(){
   const arr=monthlyTransactions(),t=totals(arr);
-  return `<div class="page-head"><div><h1>Transactions</h1><div class="hint">Complete transaction history for the selected month.</div></div><div style="display:flex;gap:9px;align-items:center">${monthSelect()}<button class="btn primary" onclick="openExpense()">+ Add expense</button></div></div>
-  <div class="cards" style="margin-bottom:16px">
-   <div class="card"><div class="label">MONTH INCOME</div><div class="value">${money(t.income)}</div><div class="hint">${monthLabel(selectedMonth)}</div></div>
-   <div class="card"><div class="label">MONTH SPENDING</div><div class="value">${money(t.spend)}</div><div class="hint">${monthLabel(selectedMonth)}</div></div>
-   <div class="card"><div class="label">TRANSACTION COUNT</div><div class="value">${arr.length}</div><div class="hint">All entries this month</div></div>
-   <div class="card"><div class="label">NET FLOW</div><div class="value">${money(t.income-t.spend)}</div><div class="hint">Income minus spending</div></div>
-  </div>
-  <section class="section"><div style="display:flex;gap:10px;margin-bottom:15px"><input id="txSearch" placeholder="Search merchant, category, bank or payment method" oninput="filterTx()"><select id="txBank" onchange="filterTx()"><option value="">All banks</option>${BANKS.map(b=>`<option>${b}</option>`).join('')}</select></div>
-  <div style="overflow:auto"><table id="txTable"><thead><tr><th>Date</th><th>Source / Merchant</th><th>Category</th><th>Bank</th><th>Payment method</th><th>Amount</th><th></th></tr></thead><tbody>${arr.map(txRow).join('')}</tbody></table></div>
-  ${!arr.length?`<div class="empty">No transactions recorded for ${monthLabel(selectedMonth)}.</div>`:''}</section>`;
+  return `<div class="page-head"><div><h1>Transactions</h1><div class="hint">Search, filter and expand any transaction without editing or deleting it.</div></div><div class="page-tools">${periodSelect()}<button class="btn" onclick="exportCSV(false)">Export CSV</button><button class="btn primary" onclick="openExpense()">+ Add expense</button></div></div>
+  <div class="cards summary-cards" style="margin-bottom:16px"><div class="card"><div class="label">INCOME</div><div class="value">${money(t.income)}</div><div class="hint">${esc(periodLabel())}</div></div><div class="card"><div class="label">SPENDING</div><div class="value">${money(t.spend)}</div><div class="hint">${esc(periodLabel())}</div></div><div class="card"><div class="label">TRANSACTIONS</div><div class="value">${arr.length}</div><div class="hint">Selected period</div></div><div class="card"><div class="label">NET FLOW</div><div class="value ${t.remaining<0?'negative':''}">${money(t.remaining)}</div><div class="hint">Income minus spending</div></div></div>
+  <section class="section"><div class="filter-grid"><input id="txSearch" placeholder="Search merchant, note, category, bank..." oninput="filterTx()"><select id="txBank" onchange="filterTx()"><option value="">All banks</option>${BANKS.map(b=>`<option>${b}</option>`).join('')}</select><select id="txType" onchange="filterTx()"><option value="">All types</option><option value="expense">Expenses</option><option value="income">Income</option></select><select id="txCategory" onchange="filterTx()"><option value="">All categories</option>${state.categories.filter(c=>c!=='Income').map(c=>`<option>${esc(c)}</option>`).join('')}</select></div>
+  <div id="txList">${arr.length?arr.map(txDetails).join(''):`<div class="empty">No transactions recorded for ${esc(periodLabel())}.</div>`}</div></section>`;
 }
-function filterTx(){const q=(txSearch.value||'').toLowerCase(),b=txBank.value;document.querySelectorAll('#txTable tbody tr').forEach(r=>{r.style.display=(!q||r.textContent.toLowerCase().includes(q))&&(!b||r.children[3].textContent===b)?'':'none'})}
-
+function filterTx(){
+  const q=(document.getElementById('txSearch')?.value||'').toLowerCase().trim(),b=document.getElementById('txBank')?.value||'',ty=document.getElementById('txType')?.value||'',c=document.getElementById('txCategory')?.value||'';
+  document.querySelectorAll('#txList .tx-item').forEach(el=>{
+    const show=(!q||el.dataset.search.includes(q))&&(!b||el.dataset.bank===b)&&(!ty||el.dataset.type===ty)&&(!c||el.dataset.category===c);
+    el.style.display=show?'':'none';
+  });
+}
 function income(){
-  const arr=state.transactions.filter(t=>t.type==='income'&&t.date.slice(0,7)===selectedMonth);
-  return `<div class="page-head"><div><h1>Income 💚</h1><div class="hint">Track incoming money and exactly where it is stored.</div></div><div style="display:flex;gap:9px;align-items:center">${monthSelect()}<button class="btn primary" onclick="openIncome()">+ Add income</button></div></div>
-  <section class="section"><div style="overflow:auto"><table><thead><tr><th>Date</th><th>Received from</th><th>Bank</th><th>Payment method</th><th>Category</th><th>Amount</th><th></th></tr></thead><tbody>${arr.map(txRow).join('')}</tbody></table></div>${!arr.length?`<div class="empty">No income for ${monthLabel(selectedMonth)}.</div>`:''}</section>`;
+  const arr=state.transactions.filter(t=>t.type==='income'&&(selectedPeriod==='all'||t.date.slice(0,7)===selectedMonth)).sort((a,b)=>b.date.localeCompare(a.date));
+  const total=arr.reduce((s,t)=>s+Number(t.amount),0);
+  return `<div class="page-head"><div><h1>Income 💚</h1><div class="hint">Track incoming money and where it is stored.</div></div><div class="page-tools">${periodSelect()}<button class="btn primary" onclick="openIncome()">+ Add income</button></div></div><div class="cards summary-cards" style="margin-bottom:16px"><div class="card"><div class="label">INCOME</div><div class="value">${money(total)}</div><div class="hint">${esc(periodLabel())}</div></div><div class="card"><div class="label">ENTRIES</div><div class="value">${arr.length}</div><div class="hint">Incoming transactions</div></div></div><section class="section">${arr.length?arr.map(txDetails).join(''):`<div class="empty">No income for ${esc(periodLabel())}.</div>`}</section>`;
 }
-
 function openIncome(){
-  openModal('Add income',`<div class="form-grid">
-  <div><label>Amount received</label><input id="iAmount" type="number" min="0" step=".01"></div>
-  <div><label>Date</label><input id="iDate" type="date" value="${new Date().toISOString().slice(0,10)}"></div>
-  <div><label>Received from</label><input id="iFrom" placeholder="Dad, Sister, Salary, Freelance"></div>
-  <div><label>Bank — where money is stored</label><select id="iBank">${BANKS.map(b=>`<option>${b}</option>`).join('')}</select></div>
-  <div><label>Payment method</label><select id="iMethod">${METHODS.map(m=>`<option>${m}</option>`).join('')}</select></div>
-  <div><label>Category</label><select id="iCat">${state.categories.map(c=>`<option>${esc(c)}</option>`).join('')}</select></div>
-  <div class="full"><label>Note</label><textarea id="iNotes" rows="3" placeholder="What is this income for?"></textarea></div>
-  <div class="full"><button class="btn primary" onclick="saveIncome()">Save income</button></div>
-  </div>`);
+  openModal('Add income',`<div class="form-grid"><div><label>Amount received</label><input id="iAmount" type="number" min="0" step=".01" autofocus></div><div><label>Date</label><input id="iDate" type="date" value="${new Date().toISOString().slice(0,10)}"></div><div><label>Received from</label><input id="iFrom" placeholder="Salary, Freelance, Dad..."></div><div><label>Bank — where money is stored</label><select id="iBank">${BANKS.map(b=>`<option>${b}</option>`).join('')}</select></div><div><label>Payment method</label><select id="iMethod">${METHODS.map(m=>`<option>${m}</option>`).join('')}</select></div><div><label>Category</label><select id="iCat">${state.categories.map(c=>`<option ${c==='Income'?'selected':''}>${esc(c)}</option>`).join('')}</select></div><div class="full"><label>Note</label><textarea id="iNotes" rows="3" placeholder="Optional note"></textarea></div><div class="full"><button class="btn primary" onclick="saveIncome()">Save income</button></div></div>`);
 }
-
 async function saveIncome(){
-  const amount=Number(document.getElementById('iAmount')?.value);
-  const from=(document.getElementById('iFrom')?.value||'').trim();
-  const date=document.getElementById('iDate')?.value;
-  const bank=document.getElementById('iBank')?.value;
-  const method=document.getElementById('iMethod')?.value;
-  const category=document.getElementById('iCat')?.value;
-  const notes=(document.getElementById('iNotes')?.value||'').trim();
+  const amount=Number(document.getElementById('iAmount')?.value),from=(document.getElementById('iFrom')?.value||'').trim(),date=document.getElementById('iDate')?.value,bank=document.getElementById('iBank')?.value,method=document.getElementById('iMethod')?.value,category=document.getElementById('iCat')?.value,notes=(document.getElementById('iNotes')?.value||'').trim();
   if(!Number.isFinite(amount)||amount<=0||!from||!date){toast('Complete the required fields');return}
   await insertTransaction({date,merchant:from,category,amount,type:'income',bank,payment_method:method,notes});
 }
-
+const QUICK_EXPENSES=[['Fuel','⛽'],['Food','🍔'],['Car Loan','🚗'],['Chitti','🪙'],['Funds','💰'],['Shopping','🛍️']];
 function openExpense(){
-  openModal('Add expense',`<div class="form-grid">
-  <div><label>Amount spent</label><input id="eAmount" type="number" min="0" step=".01"></div>
-  <div><label>Date</label><input id="eDate" type="date" value="${new Date().toISOString().slice(0,10)}"></div>
-  <div><label>Merchant / source</label><input id="eMerchant" placeholder="Swiggy, Amazon, Uber..."></div>
-  <div><label>Bank — money spent from</label><select id="eBank">${BANKS.map(b=>`<option>${b}</option>`).join('')}</select></div>
-  <div><label>Payment method</label><select id="eMethod">${METHODS.map(m=>`<option>${m}</option>`).join('')}</select></div>
-  <div><label>Category</label><select id="eCat">${state.categories.map(c=>`<option>${esc(c)}</option>`).join('')}</select></div>
-  <div class="full"><label>Note</label><textarea id="eNotes" rows="3" placeholder="What is this expense for?"></textarea></div>
-  <div class="full"><button class="btn primary" onclick="saveExpense()">Save expense</button></div>
-  </div>`);
+  openModal('Add expense',`<div class="quick-title">Quick category</div><div class="quick-chips">${QUICK_EXPENSES.map(([c,icon])=>`<button type="button" class="quick-chip" onclick="quickCategory('${esc(c)}')">${icon} ${esc(c)}</button>`).join('')}</div><div class="form-grid"><div><label>Amount spent</label><input id="eAmount" type="number" min="0" step=".01" autofocus></div><div><label>Date</label><input id="eDate" type="date" value="${new Date().toISOString().slice(0,10)}"></div><div><label>Merchant / source</label><input id="eMerchant" placeholder="Swiggy, Amazon, Uber..."></div><div><label>Bank — money spent from</label><select id="eBank">${BANKS.map(b=>`<option>${b}</option>`).join('')}</select></div><div><label>Payment method</label><select id="eMethod">${METHODS.map(m=>`<option>${m}</option>`).join('')}</select></div><div><label>Category</label><select id="eCat">${state.categories.filter(c=>c!=='Income').map(c=>`<option>${esc(c)}</option>`).join('')}</select></div><div class="full"><label>Note</label><textarea id="eNotes" rows="3" placeholder="Optional — e.g. petrol for office commute"></textarea></div><div class="full"><button class="btn primary" onclick="saveExpense()">Save expense</button></div></div>`);
 }
-
+function quickCategory(category){const el=document.getElementById('eCat');if(el){el.value=category;el.focus();}document.querySelectorAll('.quick-chip').forEach(b=>b.classList.toggle('selected',b.textContent.includes(category)));}
 async function saveExpense(){
-  const amount=Number(document.getElementById('eAmount')?.value);
-  const merchant=(document.getElementById('eMerchant')?.value||'').trim();
-  const date=document.getElementById('eDate')?.value;
-  const bank=document.getElementById('eBank')?.value;
-  const method=document.getElementById('eMethod')?.value;
-  const category=document.getElementById('eCat')?.value;
-  const notes=(document.getElementById('eNotes')?.value||'').trim();
+  const amount=Number(document.getElementById('eAmount')?.value),merchant=(document.getElementById('eMerchant')?.value||'').trim(),date=document.getElementById('eDate')?.value,bank=document.getElementById('eBank')?.value,method=document.getElementById('eMethod')?.value,category=document.getElementById('eCat')?.value,notes=(document.getElementById('eNotes')?.value||'').trim();
   if(!Number.isFinite(amount)||amount<=0||!merchant||!date){toast('Complete the required fields');return}
   await insertTransaction({date,merchant,category,amount,type:'expense',bank,payment_method:method,notes});
 }
-
-async function loadDashboardTotals(user){
-  if(!user?.id)return false;
-  const {data,error}=await sb.from('dashboard_totals')
-    .select('total_income,total_spending')
-    .eq('user_id',user.id)
-    .maybeSingle();
-  if(error){
-    console.error('SpendIt dashboard totals load error:',error);
-    toast('Dashboard totals sync error: '+error.message);
-    return false;
-  }
-  if(data){
-    state.dashboardTotals={
-      income:Number(data.total_income)||0,
-      spending:Number(data.total_spending)||0
-    };
-    return true;
-  }
-
-  // One-time migration of the old metadata totals into the dedicated table.
-  const meta=user.user_metadata||{};
-  const income=Number(meta.spendit_total_income)||0;
-  const spending=Number(meta.spendit_total_spending)||0;
-  const {data:seed,error:seedError}=await sb.from('dashboard_totals')
-    .upsert({user_id:user.id,total_income:income,total_spending:spending},{onConflict:'user_id'})
-    .select('total_income,total_spending')
-    .single();
-  if(seedError){
-    console.error('SpendIt dashboard totals seed error:',seedError);
-    toast('Could not initialize dashboard totals: '+seedError.message);
-    return false;
-  }
-  state.dashboardTotals={
-    income:Number(seed.total_income)||0,
-    spending:Number(seed.total_spending)||0
-  };
-  return true;
+function openCSV(){openModal('Import CSV',`<p class="hint">Columns: date, merchant, amount, category, bank, payment_method, notes. Positive amounts are income; negative amounts are expenses.</p><input id="csv" type="file" accept=".csv"><div style="margin-top:15px;text-align:right"><button class="btn primary" onclick="importCSV()">Import</button></div>`)}
+function parseCSVLine(line){const out=[];let cur='',quote=false;for(let i=0;i<line.length;i++){const c=line[i];if(c==='"'){if(quote&&line[i+1]==='"'){cur+='"';i++}else quote=!quote}else if(c===','&&!quote){out.push(cur.trim());cur=''}else cur+=c}out.push(cur.trim());return out}
+async function importCSV(){
+  const f=document.getElementById('csv')?.files?.[0];if(!f){toast('Choose a CSV file');return}if(!currentUser){toast('Please sign in first');return}
+  const reader=new FileReader();reader.onload=async()=>{const lines=reader.result.split(/\r?\n/).filter(Boolean),head=parseCSVLine(lines.shift()).map(x=>x.toLowerCase()),rows=[];
+    for(const line of lines){const c=parseCSVLine(line),get=names=>{const i=head.findIndex(h=>names.includes(h));return i>=0?c[i]:''};const date=get(['date']),merchant=get(['merchant','description','source']),raw=(get(['amount'])||'').replace(/[₹,\s]/g,''),amount=parseFloat(raw);if(!date||!merchant||!Number.isFinite(amount)||amount===0)continue;rows.push({user_id:currentUser.id,date,merchant,category:get(['category'])||'Other',amount:Math.abs(amount),type:amount>0?'income':'expense',bank:get(['bank'])||'HDFC',payment_method:get(['payment_method','payment method','method'])||'Account Transfer',notes:get(['notes'])||null})}
+    if(!rows.length){toast('No valid transactions found');return}const {error}=await sb.from('transactions').insert(rows);if(error){console.error(error);toast('Import failed: '+error.message);return}await loadTransactions();closeModal();selectedPeriod='month';selectedMonth=rows[rows.length-1].date.slice(0,7);page='Transactions';renderNav();render();toast(rows.length+' transaction(s) imported')};reader.readAsText(f)
 }
-
-async function saveDashboardTotals(){
-  if(!currentUser)return false;
-  const {data,error}=await sb.from('dashboard_totals')
-    .upsert({
-      user_id:currentUser.id,
-      total_income:Number(state.dashboardTotals.income)||0,
-      total_spending:Number(state.dashboardTotals.spending)||0,
-      updated_at:new Date().toISOString()
-    },{onConflict:'user_id'})
-    .select('total_income,total_spending')
-    .single();
-  if(error){
-    console.error('SpendIt totals save error:',error);
-    toast('Dashboard totals could not be saved: '+error.message);
-    return false;
-  }
-  state.dashboardTotals={
-    income:Number(data.total_income)||0,
-    spending:Number(data.total_spending)||0
-  };
-  return true;
+function csvEscape(v){const s=String(v??'');return /[",\n]/.test(s)?`"${s.replace(/"/g,'""')}"`:s}
+function exportCSV(all=false){
+  const arr=all?[...state.transactions]:periodTransactions();
+  if(!arr.length){toast('Nothing to export');return}
+  const head=['date','merchant','amount','type','category','bank','payment_method','notes'];
+  const rows=arr.map(t=>[t.date,t.merchant,t.amount,t.type,t.category,t.bank,t.paymentMethod,t.notes].map(csvEscape).join(','));
+  const blob=new Blob([[head.join(','),...rows].join('\n')],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`spendit-${all?'all-data':selectedPeriod==='all'?'all-time':selectedMonth}.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('CSV exported');
 }
+function backup(){
+  const payload={app:'SpendIt',exportedAt:new Date().toISOString(),user:currentUser?.email||null,transactions:state.transactions};
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}));a.download='spendit-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('Backup exported');
+}
+function settings(){
+  const theme=localStorage.getItem('spendit_theme')||'dark';
+  return `<div class="page-head"><div><h1>Settings</h1><div class="hint">Signed in as ${esc(currentUser?.email||'')}</div></div><button class="btn" onclick="logout()">Sign out</button></div>
+  <section class="section"><h2>Appearance</h2><div class="theme-row"><button class="theme-option ${theme==='dark'?'selected':''}" onclick="setTheme('dark')">🌙 Dark</button><button class="theme-option ${theme==='light'?'selected':''}" onclick="setTheme('light')">☀️ Light</button></div></section>
+  <section class="section" style="margin-top:16px"><h2>Net worth</h2><p class="hint">Optional manual snapshot. This does not change transaction balances.</p><div class="form-grid"><div><label>Total assets</label><input id="assets" type="number" value="${state.settings.assets}"></div><div><label>Total liabilities</label><input id="liabilities" type="number" value="${state.settings.liabilities}"></div><div><button class="btn primary" onclick="saveNW()">Save net worth</button></div></div></section>
+  <section class="section" style="margin-top:16px"><h2>Data & backup</h2><p class="hint">Your transactions remain in Supabase and sync across signed-in devices. Export a local copy whenever you want.</p><div class="data-actions"><button class="btn" onclick="exportCSV(false)">Export selected period CSV</button><button class="btn" onclick="exportCSV(true)">Export all transactions CSV</button><button class="btn primary" onclick="backup()">Download JSON backup</button></div></section>`;
+}
+function setTheme(theme){localStorage.setItem('spendit_theme',theme);applyTheme();render()}
+function applyTheme(){document.documentElement.classList.toggle('theme-light',localStorage.getItem('spendit_theme')==='light')}
+function saveNW(){state.settings.assets=+document.getElementById('assets')?.value||0;state.settings.liabilities=+document.getElementById('liabilities')?.value||0;state.settings.netWorthConfigured=true;render();toast('Net worth saved on this device')}
 
 async function insertTransaction(payload){
   if(!currentUser){toast('Please sign in first');return false}
-  const row={
-    user_id:currentUser.id,
-    date:payload.date,
-    merchant:payload.merchant,
-    amount:Number(payload.amount),
-    type:payload.type,
-    category:payload.category,
-    bank:payload.bank,
-    payment_method:payload.payment_method,
-    notes:payload.notes||null
-  };
+  const row={user_id:currentUser.id,date:payload.date,merchant:payload.merchant,amount:Number(payload.amount),type:payload.type,category:payload.category,bank:payload.bank,payment_method:payload.payment_method,notes:payload.notes||null};
   const {data,error}=await sb.from('transactions').insert(row).select('*').single();
-  if(error){
-    console.error('SpendIt insert error:',error);
-    toast('Could not save: '+(error.message||'Database error'));
-    return false;
-  }
-  // The database trigger updates dashboard_totals atomically when this
-  // transaction is inserted. Do not increment the local totals here.
-  await loadDashboardTotals(currentUser);
-  await loadTransactions();
-  await syncNow();
-  closeModal();selectedMonth=payload.date.slice(0,7);render();
-  toast(payload.type==='income'?'Income added':'Expense added');
-  return !!data;
+  if(error){console.error('SpendIt insert error:',error);toast('Could not save: '+(error.message||'Database error'));return false}
+  await loadDashboardTotals(currentUser);await loadTransactions();await syncNow();closeModal();selectedPeriod='month';selectedMonth=payload.date.slice(0,7);render();toast(payload.type==='income'?'Income added':'Expense added');return !!data;
 }
-
-async function loadTransactions(silent=false){
-  if(!currentUser)return false;
-  const {data,error}=await sb.from('transactions')
-    .select('*')
-    .eq('user_id',currentUser.id)
-    .order('date',{ascending:false})
-    .order('created_at',{ascending:false});
-  if(error){
-    console.error('SpendIt load error:',error);
-    if(!silent)toast('Could not load your data: '+(error.message||'Database error'));
-    return false;
-  }
-  state.transactions=(data||[]).map(r=>({
-    id:r.id,date:r.date,merchant:r.merchant,amount:Number(r.amount),type:r.type,category:r.category,
-    bank:r.bank,paymentMethod:r.payment_method,notes:r.notes,created_at:r.created_at,user_id:r.user_id
-  }));
-  updateSyncUI();
-  return true;
-}
-
-async function editTransaction(id){
-  const t=state.transactions.find(x=>Number(x.id)===Number(id));
-  if(!t)return;
-  openModal('Edit transaction',`<div class="form-grid">
-  <div><label>Amount</label><input id="xAmount" type="number" min="0" step=".01" value="${Number(t.amount)}"></div>
-  <div><label>Date</label><input id="xDate" type="date" value="${esc(t.date)}"></div>
-  <div><label>Source / Merchant</label><input id="xMerchant" value="${esc(t.merchant)}"></div>
-  <div><label>Bank</label><select id="xBank">${BANKS.map(b=>`<option ${b===t.bank?'selected':''}>${b}</option>`).join('')}</select></div>
-  <div><label>Payment method</label><select id="xMethod">${METHODS.map(m=>`<option ${m===t.paymentMethod?'selected':''}>${m}</option>`).join('')}</select></div>
-  <div><label>Category</label><select id="xCat">${state.categories.map(c=>`<option ${c===t.category?'selected':''}>${esc(c)}</option>`).join('')}</select></div>
-  <div><label>Type</label><select id="xType"><option value="expense" ${t.type==='expense'?'selected':''}>Expense</option><option value="income" ${t.type==='income'?'selected':''}>Income</option></select></div>
-  <div class="full"><button class="btn primary" onclick="updateTransaction(${Number(t.id)})">Save changes</button></div>
-  </div>`);
-}
-
-async function updateTransaction(id){
-  if(!currentUser){toast('Please sign in first');return}
-  const date=document.getElementById('xDate')?.value;
-  const merchant=(document.getElementById('xMerchant')?.value||'').trim();
-  const amount=Number(document.getElementById('xAmount')?.value);
-  const bank=document.getElementById('xBank')?.value;
-  const method=document.getElementById('xMethod')?.value;
-  const category=document.getElementById('xCat')?.value;
-  const type=document.getElementById('xType')?.value;
-  if(!date||!merchant||!Number.isFinite(amount)||amount<=0){toast('Complete the required fields');return}
-  const {data,error}=await sb.from('transactions')
-    .update({date,merchant,amount,bank,payment_method:method,category,type})
-    .eq('id',id)
-    .eq('user_id',currentUser.id)
-    .select('*')
-    .maybeSingle();
-  if(error){console.error('SpendIt update error:',error);toast('Could not update: '+error.message);return}
-  if(!data){toast('Update was not applied. Please refresh and try again.');return}
-  await loadTransactions();closeModal();render();toast('Transaction updated');
-}
-
-async function deleteTransaction(id){
-  if(!currentUser||!confirm('Delete this transaction?'))return;
-  const {data,error}=await sb.from('transactions')
-    .delete().eq('id',id).eq('user_id',currentUser.id).select('id');
-  if(error){console.error('SpendIt delete error:',error);toast('Could not delete: '+error.message);return}
-  if(!data?.length){toast('Delete was not applied. Please refresh and try again.');return}
-  await loadTransactions();render();toast('Transaction deleted');
-}
-
-function openCSV(){
-  openModal('Import CSV',`<p class="hint">Columns: date, merchant, amount, category, bank, payment_method. Positive amounts are income; negative amounts are expenses. Bank values: HDFC, SBI, Punjab. Payment values: Google Pay, PhonePe, Cash, Account Transfer.</p><input id="csv" type="file" accept=".csv"><div style="margin-top:15px;text-align:right"><button class="btn primary" onclick="importCSV()">Import</button></div>`);
-}
-function parseCSVLine(line){const out=[];let cur='',quote=false;for(let i=0;i<line.length;i++){const c=line[i];if(c==='"'){if(quote&&line[i+1]==='"'){cur+='"';i++}else quote=!quote}else if(c===','&&!quote){out.push(cur.trim());cur=''}else cur+=c}out.push(cur.trim());return out}
-
-async function importCSV(){
-  const f=csv.files[0];if(!f){toast('Choose a CSV file');return}
-  if(!currentUser){toast('Please sign in first');return}
-  const reader=new FileReader();
-  reader.onload=async()=>{
-    const lines=reader.result.split(/\r?\n/).filter(Boolean),head=parseCSVLine(lines.shift()).map(x=>x.toLowerCase());
-    const rows=[];
-    for(const line of lines){
-      const c=parseCSVLine(line),get=(names)=>{const i=head.findIndex(h=>names.includes(h));return i>=0?c[i]:''};
-      const date=get(['date']),merchant=get(['merchant','description','source']),raw=(get(['amount'])||'').replace(/[₹,\s]/g,''),amount=parseFloat(raw);
-      if(!date||!merchant||!Number.isFinite(amount)||amount===0)continue;
-      rows.push({
-        user_id:currentUser.id,date,merchant,category:get(['category'])||'Needs review',
-        amount:Math.abs(amount),type:amount>0?'income':'expense',
-        bank:get(['bank'])||'HDFC',payment_method:get(['payment_method','payment method','method'])||'Account Transfer',
-        notes:get(['notes'])||null
-      });
-    }
-    if(!rows.length){toast('No valid transactions found');return}
-    const {error}=await sb.from('transactions').insert(rows);
-    if(error){console.error(error);toast('Import failed: '+error.message);return}
-    await loadTransactions();closeModal();page='Transactions';renderNav();render();
-    toast(rows.length+' transaction(s) imported');
-  };
-  reader.readAsText(f);
-}
-
-function recurring(){return simpleList('Recurring','recurring')}
-function subscriptions(){return simpleList('Subscriptions','subscriptions')}
-function simpleList(title,key){const arr=state[key]||[];return `<div class="page-head"><div><h1>${title}</h1><div class="hint">These are currently device-local extras. Transactions are cloud-synced.</div></div><button class="btn primary" onclick="simpleAdd('${key}')">+ Add</button></div><section class="section">${arr.length?arr.map((x,i)=>`<div class="statrow"><span><strong>${esc(x.name)}</strong><br><small>${money(x.amount)} · ${esc(x.cadence||'monthly')}</small></span><button class="btn" onclick="deleteSimple('${key}',${i})">Delete</button></div>`).join(''):`<div class="empty">Nothing added yet.</div>`}</section>`}
-function simpleAdd(key){openModal('Add '+key,`<div class="form-grid"><div class="full"><label>Name</label><input id="sName"></div><div><label>Amount</label><input id="sAmount" type="number"></div><div><label>Cadence</label><select id="sCad"><option>monthly</option><option>weekly</option><option>quarterly</option><option>annual</option></select></div><div class="full"><button class="btn primary" onclick="saveSimple('${key}')">Save</button></div></div>`)}
-function saveSimple(key){const name=sName.value.trim(),amount=+sAmount.value||0;if(!name)return;state[key].push({name,amount,cadence:sCad.value});render()}
-function deleteSimple(k,i){if(confirm('Delete this item?')){state[k].splice(i,1);render()}}
-function budgets(){return `<div class="page-head"><div><h1>Budgets</h1><div class="hint">Create monthly category limits.</div></div><button class="btn primary" onclick="simpleAdd('budgets')">+ Create budget</button></div><section class="section">${state.budgets.length?state.budgets.map((b,i)=>`<div class="statrow"><span>${esc(b.name)}</span><strong>${money(b.amount)}</strong></div>`).join(''):`<div class="empty">No budgets yet.</div>`}</section>`}
-function goals(){return `<div class="page-head"><div><h1>Goals</h1><div class="hint">Track savings targets.</div></div><button class="btn primary" onclick="simpleAdd('goals')">+ Create goal</button></div><section class="section">${state.goals.length?state.goals.map(g=>`<div class="statrow"><span>${esc(g.name)}</span><strong>${money(g.amount)}</strong></div>`).join(''):`<div class="empty">No goals yet.</div>`}</section>`}
-function documents(){return `<div class="page-head"><div><h1>Documents</h1><div class="hint">Manual-only document area. This dashboard is designed for laptop, iPhone and Android screens.</div></div></div><section class="section"><div class="empty">No documents yet.</div></section>`}
-function rules(){return `<div class="page-head"><div><h1>Rules</h1><div class="hint">Optional manual rules.</div></div></div><section class="section"><div class="empty">No rules yet.</div></section>`}
-function settings(){
-  return `<div class="page-head"><div><h1>Settings</h1><div class="hint">Signed in as ${esc(currentUser?.email||'')}</div></div><button class="btn" onclick="logout()">Sign out</button></div>
-  <section class="section"><h2>Dashboard totals</h2><p class="hint">These two tiles are separate from the transaction list. Adding a transaction increases the relevant tile; deleting or editing a transaction does not reduce these totals.</p><div class="form-grid"><div><label>Total income</label><input id="dashIncome" type="number" min="0" step=".01" value="${Number(state.dashboardTotals.income)||0}"></div><div><label>Total spending</label><input id="dashSpending" type="number" min="0" step=".01" value="${Number(state.dashboardTotals.spending)||0}"></div><div><button class="btn primary" onclick="saveDashboardTotalsFromForm()">Save dashboard totals</button></div></div></section>
-  <section class="section" style="margin-top:16px"><h2>Net worth</h2><div class="form-grid"><div><label>Total assets</label><input id="assets" type="number" value="${state.settings.assets}"></div><div><label>Total liabilities</label><input id="liabilities" type="number" value="${state.settings.liabilities}"></div><div><button class="btn primary" onclick="saveNW()">Save</button></div></div></section>
-  <section class="section" style="margin-top:16px"><h2>Data</h2><p class="hint">Transactions and dashboard totals are stored securely in your SpendIt Supabase database and sync between devices.</p><button class="btn" onclick="backup()">Export current transaction backup</button></section>`;
-}
-async function saveDashboardTotalsFromForm(){
-  const income=Number(document.getElementById('dashIncome')?.value);
-  const spending=Number(document.getElementById('dashSpending')?.value);
-  if(!Number.isFinite(income)||income<0||!Number.isFinite(spending)||spending<0){toast('Enter valid dashboard totals');return}
-  state.dashboardTotals={income,spending};
-  if(await saveDashboardTotals()){render();toast('Dashboard totals saved');}
-}
-function saveNW(){state.settings.assets=+assets.value||0;state.settings.liabilities=+liabilities.value||0;state.settings.netWorthConfigured=true;render();toast('Saved on this device')}
-function backup(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(state.transactions,null,2)],{type:'application/json'}));a.download='spendit-transactions-backup.json';a.click()}
 
 let syncTimer=null;
 let syncInProgress=false;
@@ -793,6 +671,11 @@ function updateSyncUI(){
   if(chip&&currentUser)chip.innerHTML='<span class="sync-dot"></span>Auto-synced';
 }
 
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')closeModal();
+  if((e.key==='n'||e.key==='N')&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&document.activeElement?.tagName!=='INPUT'&&document.activeElement?.tagName!=='TEXTAREA'&&document.activeElement?.tagName!=='SELECT'){e.preventDefault();openExpense()}
+  if(e.key==='/'&&document.activeElement?.tagName!=='INPUT'&&document.activeElement?.tagName!=='TEXTAREA'&&document.activeElement?.tagName!=='SELECT'){const s=document.getElementById('txSearch');if(s){e.preventDefault();s.focus()}}
+});
 function showAuthError(msg){const el=document.getElementById('authError');el.textContent=msg;el.style.display='block'}
 function clearAuthError(){const el=document.getElementById('authError');el.style.display='none';el.textContent=''}
 async function login(){
