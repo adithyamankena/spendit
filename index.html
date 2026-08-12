@@ -375,7 +375,7 @@ function closeModal(){modal.classList.remove('open')}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
 modal.addEventListener('click',e=>{if(e.target===modal)closeModal()});
 
-const navItems=['Dashboard','Transactions','Income','Documents','Settings'];
+const navItems=['Dashboard','Transactions','Income','Settings'];
 function renderNav(){
   const markup=navItems.map(x=>`<button class="${page===x?'active':''}" onclick="go('${x}')">${x}</button>`).join('');
   nav.innerHTML=markup;mobileNav.innerHTML=markup;
@@ -506,7 +506,9 @@ async function saveDashboardTotals(){
     spendit_total_spending:Number(state.dashboardTotals.spending)||0
   }});
   if(error){console.error('SpendIt totals save error:',error);toast('Transaction saved, but dashboard total could not be updated: '+error.message);return false}
-  if(data?.user)currentUser=data.user;
+  const refreshed=await sb.auth.refreshSession();
+  if(!refreshed.error && refreshed.data?.user) currentUser=refreshed.data.user;
+  else if(data?.user) currentUser=data.user;
   return true;
 }
 
@@ -669,11 +671,18 @@ async function syncNow(){
   if(!currentUser||syncInProgress)return;
   syncInProgress=true;
   try{
-    const {data,error}=await sb.auth.getUser();
-    if(error||!data?.user||data.user.id!==currentUser.id)return;
-    currentUser=data.user;
-    await loadDashboardTotals(currentUser);
-    await loadTransactions(true);
+    // Force a fresh Auth session/user fetch so dashboard totals stored
+    // in user metadata are refreshed on every device.
+    const refreshed=await sb.auth.refreshSession();
+    if(refreshed.error) throw refreshed.error;
+    const freshUser=refreshed.data?.user;
+    if(!freshUser||freshUser.id!==currentUser.id) return;
+
+    currentUser=freshUser;
+    await loadDashboardTotals(freshUser);
+    const loaded=await loadTransactions(true);
+    if(!loaded) return;
+
     updateSyncUI();
     if(page==='Dashboard'||page==='Transactions'||page==='Income')render();
   }catch(err){
