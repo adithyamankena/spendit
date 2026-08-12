@@ -406,7 +406,7 @@ button,a,select,input{touch-action:manipulation}
  <nav class="nav" id="nav"></nav>
 </aside>
 <main class="main">
- <header class="topbar actions-bar">
+ <header class="topbar actions-bar"><span id="userChip" aria-hidden="true" style="display:none"></span>
   <div class="top-actions">
    <button class="btn" onclick="openCSV()">Import CSV</button>
    <button class="btn" onclick="openIncome()">+ Add income</button>
@@ -860,7 +860,7 @@ async function enterApp(user){
   enteringUserId=user.id;
   currentUser=user;
   document.getElementById('authScreen').style.display='none';
-  document.getElementById('userChip').innerHTML='<span class="sync-dot"></span>Syncing...';
+  const chip=document.getElementById('userChip'); if(chip) chip.innerHTML='<span class="sync-dot"></span>Syncing...';
   await loadDashboardTotals(user);
   await loadTransactions();
   renderNav();render();
