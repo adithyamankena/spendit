@@ -113,6 +113,37 @@ label{display:block;font-size:12px;color:#9da6bc;font-weight:750;margin-bottom:5
 .bar{flex:1;min-height:5px;background:linear-gradient(180deg,var(--cyan),var(--blue));border-radius:10px 10px 4px 4px;position:relative;box-shadow:0 0 24px rgba(89,225,255,.18)}
 .bar span{position:absolute;bottom:-25px;left:50%;transform:translateX(-50%);font-size:10px;color:#8e97ad;white-space:nowrap}
 .statrow{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.spend-breakdown{display:grid;grid-template-columns:210px 1fr;gap:22px;align-items:center}
+.spend-donut-wrap{display:flex;align-items:center;justify-content:center;min-height:210px}
+.spend-donut{
+ width:184px;height:184px;border-radius:50%;position:relative;
+ background:conic-gradient(var(--cyan) 0deg 60deg,var(--blue) 60deg 120deg,var(--pink) 120deg 180deg,var(--orange) 180deg 240deg,var(--green) 240deg 300deg,var(--red) 300deg 360deg);
+ box-shadow:0 0 30px rgba(89,225,255,.12)
+}
+.spend-donut::after{content:"";position:absolute;inset:34px;border-radius:50%;background:#151a2b;border:1px solid rgba(255,255,255,.08)}
+.spend-donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1;text-align:center;pointer-events:none}
+.spend-donut-center strong{font-size:17px}.spend-donut-center span{font-size:11px;color:var(--muted);margin-top:4px}
+.spend-list{min-width:0}
+.spend-row{
+ width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;
+ padding:10px 0;border:0;border-bottom:1px solid rgba(255,255,255,.08);
+ background:transparent;color:var(--text);text-align:left;cursor:pointer
+}
+.spend-row:hover{background:rgba(255,255,255,.035)}
+.spend-row-main{min-width:0}
+.spend-row-top{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.spend-row-top span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.spend-row-top strong{white-space:nowrap}
+.spend-track{height:8px;margin-top:7px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden}
+.spend-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--cyan),var(--blue))}
+.spend-row.active{background:rgba(89,225,255,.06)}
+.spend-row.active .spend-fill{background:linear-gradient(90deg,var(--pink),var(--blue))}
+@media(max-width:700px){
+ .spend-breakdown{display:block}
+ .spend-donut-wrap{display:none}
+ .spend-row{padding:12px 0}
+}
+
 .pill{display:inline-block;background:rgba(118,87,255,.15);border:1px solid rgba(118,87,255,.2);color:#c8bcff;border-radius:99px;padding:5px 9px;font-size:11px;font-weight:750}
 
 /* floating mobile liquid glass nav */
@@ -445,6 +476,12 @@ function monthlyTransactions(){
 }
 function totals(arr){const income=arr.filter(t=>t.type==='income').reduce((s,t)=>s+Number(t.amount),0),spend=arr.filter(t=>t.type==='expense').reduce((s,t)=>s+Number(t.amount),0);return {income,spend,rate:income?((income-spend)/income)*100:0}}
 
+
+function focusSpendCat(btn){
+  document.querySelectorAll('.spend-row').forEach(x=>x.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+}
+
 function dashboard(){
   const arr=monthlyTransactions();
   const t=totals(arr);
@@ -491,7 +528,36 @@ function dashboard(){
 
   <div class="grid2">
     <section class="section"><h2>Cash flow</h2>${cashPoints.length?`<div class="bar-wrap">${cashPoints.map(p=>`<div class="bar" style="height:${Math.max(7,((p.income+p.spend)/cashMax)*175)}px"><span>${esc(p.label)}</span></div>`).join('')}</div><div class="hint" style="margin-top:4px">Income and spending activity for the selected period.</div>`:`<div class="empty">No transaction data for ${esc(periodName)}.</div>`}</section>
-    <section class="section"><h2>Spending by category</h2>${catEntries.length?catEntries.slice(0,8).map(([k,v])=>`<div class="statrow"><span>${esc(k)}</span><strong>${money(v)}</strong></div>`).join(''):`<div class="empty">No spending data for ${esc(periodName)}.</div>`}</section>
+    <section class="section">
+      <h2>Where did my money go?</h2>
+      ${catEntries.length?(() => {
+        const topCats=catEntries.slice(0,8);
+        const palette=['var(--cyan)','var(--blue)','var(--pink)','var(--orange)','var(--green)','var(--red)'];
+        let angle=0;
+        const stops=topCats.map(([k,v],i)=>{
+          const next=angle+(v/t.spend)*360;
+          const stop=`${palette[i%palette.length]} ${angle}deg ${next}deg`;
+          angle=next;
+          return stop;
+        }).join(',');
+        const donut=`conic-gradient(${stops})`;
+        return `<div class="spend-breakdown">
+          <div class="spend-donut-wrap">
+            <div class="spend-donut" style="background:${donut}" aria-label="Spending breakdown donut chart">
+              <div class="spend-donut-center"><strong>${money(t.spend)}</strong><span>${esc(periodName)}</span></div>
+            </div>
+          </div>
+          <div class="spend-list">
+            ${topCats.map(([k,v],i)=>`<button type="button" class="spend-row" onmouseenter="focusSpendCat(this)" onfocus="focusSpendCat(this)" onclick="focusSpendCat(this)" aria-label="${esc(k)} ${money(v)}">
+              <div class="spend-row-main">
+                <div class="spend-row-top"><span>${esc(k)}</span><strong>${money(v)}</strong></div>
+                <div class="spend-track"><div class="spend-fill" style="width:${Math.max(2,(v/max)*100)}%;background:${palette[i%palette.length]}"></div></div>
+              </div>
+            </button>`).join('')}
+          </div>
+        </div>`;
+      })():`<div class="empty">No spending data for ${esc(periodName)}.</div>`}
+    </section>
   </div>
 
   <section class="section" style="margin-top:16px"><h2>Recent activity</h2>${recent.length?`<div style="overflow:auto"><table><thead><tr><th>Date</th><th>Source / Merchant</th><th>Category</th><th>Bank</th><th>Payment method</th><th>Amount</th><th></th></tr></thead><tbody>${recent.map(txRow).join('')}</tbody></table></div>`:`<div class="empty">No transactions recorded for ${esc(periodName)}. Use <b style="margin:0 4px">+ Add income</b> or <b style="margin-left:4px">+ Add expense</b>.</div>`}</section>`;
