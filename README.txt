@@ -1,13 +1,12 @@
-SPENDIT V12 — TITLE SEPARATION ONLY
+SPENDIT V13 — CATEGORIES + NOTE ONLY
 
-Based on the verified SpendIt v11 working version.
+Requested changes:
+- Add Car Loan, Fuel, Chitti, Funds to Add Income/Add Expense categories.
+- Remove Housing and Needs review.
+- Add a Note text box to Add Income and Add Expense for describing what the entry is for.
 
-Requested change only:
-- Separate the SpendIt branding/header from the "Your Data" dashboard section title.
-- Give the dashboard title its own clear visual spacing/area.
-- Keep the existing v11 sync/database/authentication/transaction behavior unchanged.
-
-Do not run the SQL again. The v11 database setup is already complete.
+Everything else remains based on the working v12 version.
+Do not run Supabase SQL again.
 
 Upload/replace only:
 index.html
@@ -15,7 +14,3 @@ manifest.webmanifest
 sw.js
 icon-192.png
 icon-512.png
-
-After GitHub Pages deploys:
-- Laptop: Ctrl+Shift+R
-- Android: close and reopen SpendIt
