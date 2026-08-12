@@ -400,6 +400,17 @@ const sb = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
 });
 
+// Explicit DOM references: do not rely on browser-created globals for element IDs.
+const $nav=document.getElementById('nav');
+const $mobileNav=document.getElementById('mobileNav');
+const $content=document.getElementById('content');
+const $modal=document.getElementById('modal');
+const $modalTitle=document.getElementById('modalTitle');
+const $modalBody=document.getElementById('modalBody');
+const $toast=document.getElementById('toast');
+const $authScreen=document.getElementById('authScreen');
+const $userChip=document.getElementById('userChip');
+
 const BANKS=['HDFC','SBI','Punjab'];
 const METHODS=['Google Pay','PhonePe','Cash','Account Transfer'];
 const CATEGORIES=['Car Loan','Fuel','Chitti','Funds','Groceries','Shopping','Dining','Transportation','Utilities','Subscriptions','Insurance','Health','Entertainment','Income','Other'];
@@ -426,22 +437,27 @@ let enteringUserId=null;
 function applyThemeSafe(){document.documentElement.classList.toggle('theme-light',localStorage.getItem('spendit_theme')==='light')}
 function money(n){return new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:2}).format(Number(n)||0)}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
-function openModal(title,body){modalTitle.textContent=title;modalBody.innerHTML=body;modal.classList.add('open')}
-function closeModal(){modal.classList.remove('open')}
+function toast(msg){const t=$toast;if(!t)return;t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
+function openModal(title,body){$modalTitle.textContent=title;$modalBody.innerHTML=body;$modal.classList.add('open')}
+function closeModal(){$modal.classList.remove('open')}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
-modal.addEventListener('click',e=>{if(e.target===modal)closeModal()});
+$modal.addEventListener('click',e=>{if(e.target===$modal)closeModal()});
 
 const navItems=['Dashboard','Transactions','Income','Settings'];
 function renderNav(){
   const markup=navItems.map(x=>`<button class="${page===x?'active':''}" onclick="go('${x}')">${x}</button>`).join('');
-  nav.innerHTML=markup;mobileNav.innerHTML=markup;
+  $nav.innerHTML=markup;$mobileNav.innerHTML=markup;
 }
 function go(p){page=p;renderNav();render();window.scrollTo({top:0,behavior:'smooth'})}
 function render(){
   const fn={Dashboard:dashboard,Transactions:transactions,Income:income,Settings:settings}[page]||dashboard;
-  content.innerHTML=fn();
-  applyTheme();
+  try{
+    $content.innerHTML=fn();
+    applyTheme();
+  }catch(err){
+    console.error('SpendIt render error:',err);
+    $content.innerHTML='<section class="section"><h2>SpendIt could not render this page</h2><p class="hint">Your cloud data has not been deleted. Refresh the page. If this message remains, contact support.</p></section>';
+  }
 }
 
 let selectedPeriod='month';
@@ -667,7 +683,7 @@ function stopSync(){
 }
 
 function updateSyncUI(){
-  const chip=document.getElementById('userChip');
+  const chip=$userChip;
   if(chip&&currentUser)chip.innerHTML='<span class="sync-dot"></span>Auto-synced';
 }
 
@@ -695,8 +711,8 @@ async function enterApp(user){
   if(enteringUserId===user.id && currentUser?.id===user.id)return;
   enteringUserId=user.id;
   currentUser=user;
-  document.getElementById('authScreen').style.display='none';
-  document.getElementById('userChip').innerHTML='<span class="sync-dot"></span>Syncing...';
+  $authScreen.style.display='none';
+  $userChip.innerHTML='<span class="sync-dot"></span>Syncing...';
   await loadDashboardTotals(user);
   await loadTransactions();
   renderNav();render();
@@ -711,7 +727,7 @@ sb.auth.onAuthStateChange(async(event,session)=>{
   }else{
     stopSync();
     currentUser=null;
-    document.getElementById('authScreen').style.display='flex';
+    $authScreen.style.display='flex';
     document.getElementById('loginPassword').value='';
   }
 });
@@ -719,7 +735,7 @@ sb.auth.onAuthStateChange(async(event,session)=>{
 (async()=>{
   const {data:{session}}=await sb.auth.getSession();
   if(session?.user) await enterApp(session.user);
-  else document.getElementById('authScreen').style.display='flex';
+  else $authScreen.style.display='flex';
 })();
 </script>
 
