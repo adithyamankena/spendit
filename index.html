@@ -115,6 +115,17 @@ label{display:block;font-size:12px;color:#9da6bc;font-weight:750;margin-bottom:5
 .statrow{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.08)}
 .spend-breakdown{display:grid;grid-template-columns:210px 1fr;gap:22px;align-items:center}
 .tx-filters{display:grid;grid-template-columns:minmax(220px,1fr) 150px 130px 180px;gap:10px;margin-bottom:8px}
+.backup-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:18px}
+.backup-card{border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.025);border-radius:16px;padding:18px;display:flex;flex-direction:column;align-items:flex-start}
+.backup-card h3{margin:12px 0 7px;font-size:17px}
+.backup-card p{color:var(--muted);font-size:13px;line-height:1.5;min-height:58px}
+.backup-card .btn{margin-top:auto}
+.backup-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;background:rgba(89,225,255,.1);color:var(--cyan);border:1px solid rgba(89,225,255,.2)}
+.backup-status{margin-top:18px;padding:14px 16px;border-radius:12px;background:rgba(89,225,255,.05);border:1px solid rgba(89,225,255,.1);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.backup-status span{color:var(--muted);font-size:12px}
+@media(max-width:900px){.backup-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:700px){.backup-grid{grid-template-columns:1fr}.backup-status{display:block}.backup-status span{display:block;margin-top:5px}}
+
 .tx-search-wrap{position:relative}
 .tx-search-wrap input{padding-left:38px}
 .tx-search-icon{position:absolute;left:13px;top:50%;transform:translateY(-51%);color:var(--muted);font-size:20px;pointer-events:none}
@@ -453,14 +464,14 @@ function closeModal(){modal.classList.remove('open')}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
 modal.addEventListener('click',e=>{if(e.target===modal)closeModal()});
 
-const navItems=['Dashboard','Transactions','Income','Settings'];
+const navItems=['Dashboard','Transactions','Income','Backup & Export','Settings'];
 function renderNav(){
   const markup=navItems.map(x=>`<button class="${page===x?'active':''}" onclick="go('${x}')">${x}</button>`).join('');
   nav.innerHTML=markup;mobileNav.innerHTML=markup;
 }
 function go(p){page=p;renderNav();render();window.scrollTo({top:0,behavior:'smooth'})}
 function render(){
-  const fn={Dashboard:dashboard,Transactions:transactions,Income:income,Recurring:recurring,Subscriptions:subscriptions,Budgets:budgets,Goals:goals,Documents:documents,Rules:rules,Settings:settings}[page];
+  const fn={Dashboard:dashboard,Transactions:transactions,Income:income,'Backup & Export':backupExport,Recurring:recurring,Subscriptions:subscriptions,Budgets:budgets,Goals:goals,Documents:documents,Rules:rules,Settings:settings}[page];
   content.innerHTML=fn();
 }
 function periodOptions(){
@@ -866,6 +877,38 @@ function budgets(){return `<div class="page-head"><div><h1>Budgets</h1><div clas
 function goals(){return `<div class="page-head"><div><h1>Goals</h1><div class="hint">Track savings targets.</div></div><button class="btn primary" onclick="simpleAdd('goals')">+ Create goal</button></div><section class="section">${state.goals.length?state.goals.map(g=>`<div class="statrow"><span>${esc(g.name)}</span><strong>${money(g.amount)}</strong></div>`).join(''):`<div class="empty">No goals yet.</div>`}</section>`}
 function documents(){return `<div class="page-head"><div><h1>Documents</h1><div class="hint">Manual-only document area. This dashboard is designed for laptop, iPhone and Android screens.</div></div></div><section class="section"><div class="empty">No documents yet.</div></section>`}
 function rules(){return `<div class="page-head"><div><h1>Rules</h1><div class="hint">Optional manual rules.</div></div></div><section class="section"><div class="empty">No rules yet.</div></section>`}
+
+function backupExport(){
+  return `<div class="page-head">
+    <div><h1>Backup & Export</h1><div class="hint">Keep a copy of your SpendIt financial history outside Supabase.</div></div>
+  </div>
+  <section class="section">
+    <h2>Data backup</h2>
+    <p class="hint">Export your transactions whenever you want. Exporting does not delete or change anything in SpendIt.</p>
+    <div class="backup-grid">
+      <div class="backup-card">
+        <div class="backup-icon">CSV</div>
+        <h3>Export my SpendIt data</h3>
+        <p>Download the transactions for the currently selected period: <strong>${esc(monthLabel(selectedMonth))}</strong>.</p>
+        <button class="btn primary" onclick="exportSelectedCsv()">Export ${esc(monthLabel(selectedMonth))} CSV</button>
+      </div>
+      <div class="backup-card">
+        <div class="backup-icon">ALL</div>
+        <h3>Export all data</h3>
+        <p>Download every transaction currently stored in your SpendIt account as a CSV file.</p>
+        <button class="btn" onclick="exportAllCsv()">Export all transactions</button>
+      </div>
+      <div class="backup-card">
+        <div class="backup-icon">JSON</div>
+        <h3>Full backup</h3>
+        <p>Save a complete JSON backup containing your transactions and dashboard totals.</p>
+        <button class="btn" onclick="backup()">Download full backup</button>
+      </div>
+    </div>
+    <div class="backup-status"><strong>${lastBackupLabel()}</strong><span>Backup files are downloaded to your device and are not stored in Supabase.</span></div>
+  </section>`;
+}
+
 function settings(){
   return `<div class="page-head"><div><h1>Settings</h1><div class="hint">Signed in as ${esc(currentUser?.email||'')}</div></div><button class="btn" onclick="logout()">Sign out</button></div>
   <section class="section"><h2>Dashboard totals</h2><p class="hint">These two tiles are separate from the transaction list. Adding a transaction increases the relevant tile; deleting or editing a transaction does not reduce these totals.</p><div class="form-grid"><div><label>Total income</label><input id="dashIncome" type="number" min="0" step=".01" value="${Number(state.dashboardTotals.income)||0}"></div><div><label>Total spending</label><input id="dashSpending" type="number" min="0" step=".01" value="${Number(state.dashboardTotals.spending)||0}"></div><div><button class="btn primary" onclick="saveDashboardTotalsFromForm()">Save dashboard totals</button></div></div></section>
@@ -880,7 +923,65 @@ async function saveDashboardTotalsFromForm(){
   if(await saveDashboardTotals()){render();toast('Dashboard totals saved');}
 }
 function saveNW(){state.settings.assets=+assets.value||0;state.settings.liabilities=+liabilities.value||0;state.settings.netWorthConfigured=true;render();toast('Saved on this device')}
-function backup(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(state.transactions,null,2)],{type:'application/json'}));a.download='spendit-transactions-backup.json';a.click()}
+
+function downloadBlob(content,filename,type){
+  const blob=new Blob([content],{type});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function csvCell(v){
+  const s=String(v??'');
+  return `"${s.replace(/"/g,'""')}"`;
+}
+function transactionsCsv(arr){
+  const headers=['Date','Type','Amount','Category','Source / Merchant','Bank','Payment Method','Note'];
+  const rows=arr.map(t=>[
+    t.date,t.type,Number(t.amount)||0,t.category,t.merchant,t.bank,t.paymentMethod,t.note||''
+  ]);
+  return [headers,...rows].map(row=>row.map(csvCell).join(',')).join('\r\n');
+}
+function markBackup(){
+  localStorage.setItem('spendit_last_backup',new Date().toISOString());
+}
+function lastBackupLabel(){
+  const raw=localStorage.getItem('spendit_last_backup');
+  if(!raw)return 'No backup exported yet';
+  const d=new Date(raw);
+  if(Number.isNaN(d.getTime()))return 'No backup exported yet';
+  return 'Last backup: '+d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+}
+function exportSelectedCsv(){
+  const arr=monthlyTransactions();
+  const suffix=selectedMonth==='all'?'All_Time':monthLabel(selectedMonth).replace(/\s+/g,'_');
+  downloadBlob(transactionsCsv(arr),`SpendIt_Transactions_${suffix}.csv`,'text/csv;charset=utf-8');
+  markBackup();
+  render();
+  toast('CSV backup exported');
+}
+function exportAllCsv(){
+  const arr=[...state.transactions].sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
+  downloadBlob(transactionsCsv(arr),'SpendIt_All_Transactions.csv','text/csv;charset=utf-8');
+  markBackup();
+  render();
+  toast('All transactions exported');
+}
+function backup(){
+  downloadBlob(JSON.stringify({
+    exportedAt:new Date().toISOString(),
+    app:'SpendIt',
+    transactions:state.transactions,
+    dashboardTotals:state.dashboardTotals
+  },null,2),'SpendIt_All_Data_Backup.json','application/json;charset=utf-8');
+  markBackup();
+  render();
+  toast('Full backup exported');
+}
 
 let syncTimer=null;
 let syncInProgress=false;
