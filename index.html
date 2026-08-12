@@ -461,6 +461,146 @@ button,a,select,input{touch-action:manipulation}
 }
 </style>
 
+
+<style>
+/* =========================================================
+   SpendIt Change 7 — Glass / Liquid Dashboard UI
+   Visual-only enhancement. Existing functionality untouched.
+   ========================================================= */
+:root{
+  --glass-bg:rgba(255,255,255,.075);
+  --glass-bg-strong:rgba(255,255,255,.105);
+  --glass-border:rgba(255,255,255,.18);
+  --glass-highlight:rgba(255,255,255,.24);
+  --glass-shadow:0 18px 55px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.09);
+}
+
+/* Soft luminous background depth */
+body{
+  background:
+    radial-gradient(circle at 12% 10%,rgba(89,225,255,.13),transparent 30%),
+    radial-gradient(circle at 88% 16%,rgba(255,103,199,.13),transparent 32%),
+    radial-gradient(circle at 50% 100%,rgba(102,133,255,.10),transparent 38%),
+    #080b16 !important;
+}
+
+/* Header */
+.topbar.actions-only{
+  background:linear-gradient(110deg,rgba(44,75,96,.42),rgba(69,45,91,.36)) !important;
+  border:1px solid var(--glass-border) !important;
+  box-shadow:var(--glass-shadow) !important;
+  backdrop-filter:blur(24px) saturate(150%);
+  -webkit-backdrop-filter:blur(24px) saturate(150%);
+}
+
+/* Sidebar / navigation becomes translucent glass */
+.sidebar{
+  background:linear-gradient(160deg,rgba(42,71,88,.62),rgba(20,25,45,.62)) !important;
+  border-right:1px solid var(--glass-border) !important;
+  box-shadow:12px 0 45px rgba(0,0,0,.20),inset -1px 0 0 rgba(255,255,255,.06);
+  backdrop-filter:blur(28px) saturate(145%);
+  -webkit-backdrop-filter:blur(28px) saturate(145%);
+}
+
+/* Main dashboard sections/cards */
+.section,
+.summary,
+.card,
+.stat,
+.kpi,
+.dashboard-card,
+.metric,
+.chart-card{
+  background:linear-gradient(135deg,rgba(255,255,255,.095),rgba(255,255,255,.045)) !important;
+  border:1px solid var(--glass-border) !important;
+  box-shadow:var(--glass-shadow) !important;
+  backdrop-filter:blur(22px) saturate(145%);
+  -webkit-backdrop-filter:blur(22px) saturate(145%);
+}
+
+/* Dashboard selected-period summary */
+.period-summary,
+.summary-panel{
+  background:linear-gradient(135deg,rgba(70,91,115,.42),rgba(87,50,104,.34)) !important;
+  border:1px solid var(--glass-border) !important;
+  box-shadow:0 20px 60px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.10) !important;
+  backdrop-filter:blur(26px) saturate(155%);
+  -webkit-backdrop-filter:blur(26px) saturate(155%);
+}
+
+/* Buttons */
+.btn{
+  border:1px solid rgba(255,255,255,.18) !important;
+  box-shadow:0 8px 25px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.10) !important;
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+}
+
+/* Form controls / selectors */
+input,select,textarea{
+  background:rgba(255,255,255,.065) !important;
+  border:1px solid rgba(255,255,255,.16) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06) !important;
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+}
+
+/* Table / transaction rows */
+table{
+  border-color:rgba(255,255,255,.10) !important;
+}
+tbody tr:hover{
+  background:rgba(255,255,255,.045) !important;
+}
+
+/* Subtle glass sheen */
+.section::before,
+.summary::before,
+.card::before,
+.dashboard-card::before{
+  content:"";
+  position:absolute;
+  pointer-events:none;
+  inset:0;
+  border-radius:inherit;
+  background:linear-gradient(120deg,rgba(255,255,255,.075),transparent 28%,transparent 70%,rgba(255,255,255,.025));
+  opacity:.7;
+}
+
+/* Keep sections above their sheen */
+.section,
+.summary,
+.card,
+.dashboard-card{
+  position:relative;
+  overflow:hidden;
+}
+
+/* Mobile glass treatment */
+@media(max-width:700px){
+  body{
+    background:
+      radial-gradient(circle at 20% 8%,rgba(89,225,255,.12),transparent 34%),
+      radial-gradient(circle at 90% 20%,rgba(255,103,199,.11),transparent 35%),
+      #080b16 !important;
+  }
+  .sidebar{
+    background:linear-gradient(160deg,rgba(31,54,69,.78),rgba(16,21,38,.82)) !important;
+  }
+  .topbar.actions-only{
+    backdrop-filter:blur(22px) saturate(145%);
+    -webkit-backdrop-filter:blur(22px) saturate(145%);
+  }
+  .section,
+  .summary,
+  .card,
+  .dashboard-card{
+    backdrop-filter:blur(18px) saturate(140%);
+    -webkit-backdrop-filter:blur(18px) saturate(140%);
+  }
+}
+</style>
+
 </head>
 <body>
 
