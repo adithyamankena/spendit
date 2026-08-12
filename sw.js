@@ -1,4 +1,4 @@
-const CACHE = "spendit-v17";
+const CACHE = "spendit-v18";
 const CORE = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", event => {

@@ -298,6 +298,35 @@ button,a,select,input{touch-action:manipulation}
  .topbar.actions-only .btn{padding:9px 10px;font-size:12px}
 }
 </style>
+
+<style>
+/* v18: restore SpendIt name on mobile without changing the actions-only toolbar */
+.mobile-spendit-brand{display:none;font-size:22px;font-weight:950;letter-spacing:-.8px;line-height:1;padding:2px 2px 1px}
+.mobile-spendit-brand span{
+  background:linear-gradient(90deg,#59e1ff,#6685ff,#ff67c7);
+  -webkit-background-clip:text;background-clip:text;color:transparent
+}
+@media(max-width:700px){
+  .topbar.actions-only{
+    min-height:96px;
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    justify-content:center;
+    gap:8px;
+    padding:10px 12px;
+  }
+  .mobile-spendit-brand{display:block}
+  .topbar.actions-only .top-actions{
+    width:100%;
+    justify-content:flex-start;
+    overflow-x:auto;
+    scrollbar-width:none;
+  }
+  .topbar.actions-only .top-actions::-webkit-scrollbar{display:none}
+}
+</style>
+
 </head>
 <body>
 
@@ -325,7 +354,7 @@ button,a,select,input{touch-action:manipulation}
  <nav class="nav" id="nav"></nav>
 </aside>
 <main class="main">
- <header class="topbar actions-only">
+ <header class="topbar actions-only"><div class="mobile-spendit-brand">Spend<span>It</span></div>
   <div class="top-actions">
     <span class="user-chip" id="userChip" aria-hidden="true" style="display:none"></span>
     <button class="btn" onclick="openCSV()">Import CSV</button>
