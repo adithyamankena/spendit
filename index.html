@@ -469,7 +469,7 @@ function dashboard(){
     arr.forEach(x=>{if(!dayMap[x.date])dayMap[x.date]={income:0,spend:0};if(x.type==='income')dayMap[x.date].income+=Number(x.amount);else if(x.type==='expense')dayMap[x.date].spend+=Number(x.amount)});
     Object.keys(dayMap).sort().slice(-7).forEach(k=>cashPoints.push({label:k.slice(8,10),income:dayMap[k].income,spend:dayMap[k].spend}));
   }
-  const cashMax=Math.max(...cashPoints.flatMap(p=>[p.income,p.spend]),1);
+  const cashMax=Math.max(...cashPoints.map(p=>p.income+p.spend),1);
 
   return `<div class="page-head">
     <div><h1>Your Data</h1><div class="hint">Private cloud-synced money snapshot</div></div>
