@@ -286,51 +286,18 @@ button,a,select,input{touch-action:manipulation}
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
-
 <style>
-/* SpendIt v12 — title/header separation only */
-.topbar{
-  padding:18px 22px 16px;
-}
-.topbar .mobile-top-row{
-  margin-top:14px;
-}
-.brand-lockup{
-  padding-bottom:2px;
-}
-.dashboard-title,
-.page-head{
-  margin-top:18px;
-}
-.dashboard-title h1{
-  margin:0;
-  font-size:clamp(30px,4vw,42px);
-  line-height:1.05;
-  letter-spacing:-1.5px;
-}
-.dashboard-title .subtitle{
-  margin-top:7px;
-  color:var(--muted);
-  font-size:13px;
-  font-weight:650;
-}
+/* SpendIt v17: actions-only top bar; dashboard title remains in page content */
+.topbar.actions-only{justify-content:flex-end;padding:0 18px}
+.topbar.actions-only .top-actions{display:flex;align-items:center;gap:9px}
+.dialog textarea{width:100%;box-sizing:border-box;resize:vertical;min-height:82px;border:1px solid var(--line);border-radius:12px;padding:12px 13px;background:rgba(255,255,255,.04);color:var(--text);font:inherit;outline:none}
+.dialog textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(102,133,255,.12)}
 @media(max-width:700px){
-  .topbar{
-    padding:13px 12px 12px;
-  }
-  .topbar .mobile-top-row{
-    margin-top:10px;
-  }
-  .dashboard-title,
-  .page-head{
-    margin-top:15px;
-  }
-  .dashboard-title h1{
-    font-size:32px;
-  }
+ .topbar.actions-only{height:auto;min-height:64px;padding:10px 10px}
+ .topbar.actions-only .top-actions{width:100%;justify-content:flex-end;gap:6px}
+ .topbar.actions-only .btn{padding:9px 10px;font-size:12px}
 }
 </style>
-
 </head>
 <body>
 
@@ -358,16 +325,14 @@ button,a,select,input{touch-action:manipulation}
  <nav class="nav" id="nav"></nav>
 </aside>
 <main class="main">
- <header class="topbar">
-  <div class="mobile-top-brand">Spend<span>It</span></div>
-  <div class="mobile-top-row"><div class="top-title" id="topTitle">Your Data</div>
+ <header class="topbar actions-only">
   <div class="top-actions">
-   <span class="user-chip" id="userChip"><span class="sync-dot"></span>Syncing</span>
-   <button class="btn" onclick="openCSV()">Import CSV</button>
-   <button class="btn" onclick="openIncome()">+ Add income</button>
-   <button class="btn primary" onclick="openExpense()">+ Add expense</button>
-  </div></div>
- </header>
+    <span class="user-chip" id="userChip" aria-hidden="true" style="display:none"></span>
+    <button class="btn" onclick="openCSV()">Import CSV</button>
+    <button class="btn" onclick="openIncome()">+ Add income</button>
+    <button class="btn primary" onclick="openExpense()">+ Add expense</button>
+  </div>
+</header>
  <div class="content"><div id="content"></div></div>
 </main>
 <nav class="mobile-nav" id="mobileNav"></nav>
@@ -392,7 +357,7 @@ const sb = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
 
 const BANKS=['HDFC','SBI','Punjab'];
 const METHODS=['Google Pay','PhonePe','Cash','Account Transfer'];
-const CATEGORIES=['Housing','Groceries','Shopping','Dining','Transportation','Utilities','Subscriptions','Insurance','Health','Entertainment','Income','Needs review','Other'];
+const CATEGORIES=['Car Loan','Fuel','Chitti','Funds','Groceries','Shopping','Dining','Transportation','Utilities','Subscriptions','Insurance','Health','Entertainment','Income','Other'];
 
 let state = {
   transactions:[],
@@ -427,7 +392,6 @@ function renderNav(){
 }
 function go(p){page=p;renderNav();render();window.scrollTo({top:0,behavior:'smooth'})}
 function render(){
-  topTitle.textContent=page==='Dashboard'?'Your Data':page;
   const fn={Dashboard:dashboard,Transactions:transactions,Income:income,Recurring:recurring,Subscriptions:subscriptions,Budgets:budgets,Goals:goals,Documents:documents,Rules:rules,Settings:settings}[page];
   content.innerHTML=fn();
 }
@@ -498,6 +462,7 @@ function openIncome(){
   <div><label>Bank — where money is stored</label><select id="iBank">${BANKS.map(b=>`<option>${b}</option>`).join('')}</select></div>
   <div><label>Payment method</label><select id="iMethod">${METHODS.map(m=>`<option>${m}</option>`).join('')}</select></div>
   <div><label>Category</label><select id="iCat">${state.categories.map(c=>`<option>${esc(c)}</option>`).join('')}</select></div>
+  <div class="full"><label>Note</label><textarea id="iNotes" rows="3" placeholder="What is this income for?"></textarea></div>
   <div class="full"><button class="btn primary" onclick="saveIncome()">Save income</button></div>
   </div>`);
 }
@@ -509,8 +474,9 @@ async function saveIncome(){
   const bank=document.getElementById('iBank')?.value;
   const method=document.getElementById('iMethod')?.value;
   const category=document.getElementById('iCat')?.value;
+  const notes=(document.getElementById('iNotes')?.value||'').trim();
   if(!Number.isFinite(amount)||amount<=0||!from||!date){toast('Complete the required fields');return}
-  await insertTransaction({date,merchant:from,category,amount,type:'income',bank,payment_method:method});
+  await insertTransaction({date,merchant:from,category,amount,type:'income',bank,payment_method:method,notes});
 }
 
 function openExpense(){
@@ -521,6 +487,7 @@ function openExpense(){
   <div><label>Bank — money spent from</label><select id="eBank">${BANKS.map(b=>`<option>${b}</option>`).join('')}</select></div>
   <div><label>Payment method</label><select id="eMethod">${METHODS.map(m=>`<option>${m}</option>`).join('')}</select></div>
   <div><label>Category</label><select id="eCat">${state.categories.map(c=>`<option>${esc(c)}</option>`).join('')}</select></div>
+  <div class="full"><label>Note</label><textarea id="eNotes" rows="3" placeholder="What is this expense for?"></textarea></div>
   <div class="full"><button class="btn primary" onclick="saveExpense()">Save expense</button></div>
   </div>`);
 }
@@ -532,8 +499,9 @@ async function saveExpense(){
   const bank=document.getElementById('eBank')?.value;
   const method=document.getElementById('eMethod')?.value;
   const category=document.getElementById('eCat')?.value;
+  const notes=(document.getElementById('eNotes')?.value||'').trim();
   if(!Number.isFinite(amount)||amount<=0||!merchant||!date){toast('Complete the required fields');return}
-  await insertTransaction({date,merchant,category,amount,type:'expense',bank,payment_method:method});
+  await insertTransaction({date,merchant,category,amount,type:'expense',bank,payment_method:method,notes});
 }
 
 async function loadDashboardTotals(user){
