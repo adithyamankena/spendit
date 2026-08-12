@@ -375,7 +375,7 @@ function closeModal(){modal.classList.remove('open')}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
 modal.addEventListener('click',e=>{if(e.target===modal)closeModal()});
 
-const navItems=['Dashboard','Transactions','Income','Recurring','Subscriptions','Budgets','Goals','Documents','Rules','Settings'];
+const navItems=['Dashboard','Transactions','Income','Documents','Settings'];
 function renderNav(){
   const markup=navItems.map(x=>`<button class="${page===x?'active':''}" onclick="go('${x}')">${x}</button>`).join('');
   nav.innerHTML=markup;mobileNav.innerHTML=markup;
@@ -421,7 +421,7 @@ function dashboard(){
 
 function txRow(t){
   const sign=t.type==='income'?'+':'−';
-  return `<tr><td>${esc(t.date)}</td><td>${esc(t.merchant)}</td><td>${esc(t.category)}</td><td>${esc(t.bank||'—')}</td><td>${esc(t.paymentMethod||'—')}</td><td class="${t.type}">${sign}${money(t.amount)}</td><td><button class="btn" onclick="editTransaction(${Number(t.id)})">Edit</button> <button class="btn" onclick="deleteTransaction(${Number(t.id)})">Delete</button></td></tr>`;
+  return `<tr><td>${esc(t.date)}</td><td>${esc(t.merchant)}</td><td>${esc(t.category)}</td><td>${esc(t.bank||'—')}</td><td>${esc(t.paymentMethod||'—')}</td><td class="${t.type}">${sign}${money(t.amount)}</td><td></td></tr>`;
 }
 
 function transactions(){
@@ -533,24 +533,30 @@ async function insertTransaction(payload){
   else state.dashboardTotals.spending += Number(payload.amount);
   await saveDashboardTotals();
   await loadTransactions();
+  await syncNow();
   closeModal();selectedMonth=payload.date.slice(0,7);render();
   toast(payload.type==='income'?'Income added':'Expense added');
   return !!data;
 }
 
-async function loadTransactions(){
-  if(!currentUser)return;
+async function loadTransactions(silent=false){
+  if(!currentUser)return false;
   const {data,error}=await sb.from('transactions')
     .select('*')
     .eq('user_id',currentUser.id)
     .order('date',{ascending:false})
     .order('created_at',{ascending:false});
-  if(error){console.error('SpendIt load error:',error);toast('Could not load your data: '+error.message);return}
+  if(error){
+    console.error('SpendIt load error:',error);
+    if(!silent)toast('Could not load your data: '+(error.message||'Database error'));
+    return false;
+  }
   state.transactions=(data||[]).map(r=>({
     id:r.id,date:r.date,merchant:r.merchant,amount:Number(r.amount),type:r.type,category:r.category,
     bank:r.bank,paymentMethod:r.payment_method,notes:r.notes,created_at:r.created_at,user_id:r.user_id
   }));
   updateSyncUI();
+  return true;
 }
 
 async function editTransaction(id){
@@ -656,9 +662,42 @@ async function saveDashboardTotalsFromForm(){
 function saveNW(){state.settings.assets=+assets.value||0;state.settings.liabilities=+liabilities.value||0;state.settings.netWorthConfigured=true;render();toast('Saved on this device')}
 function backup(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(state.transactions,null,2)],{type:'application/json'}));a.download='spendit-transactions-backup.json';a.click()}
 
+let syncTimer=null;
+let syncInProgress=false;
+
+async function syncNow(){
+  if(!currentUser||syncInProgress)return;
+  syncInProgress=true;
+  try{
+    const {data,error}=await sb.auth.getUser();
+    if(error||!data?.user||data.user.id!==currentUser.id)return;
+    currentUser=data.user;
+    await loadDashboardTotals(currentUser);
+    await loadTransactions(true);
+    updateSyncUI();
+    if(page==='Dashboard'||page==='Transactions'||page==='Income')render();
+  }catch(err){
+    console.error('SpendIt sync error:',err);
+  }finally{
+    syncInProgress=false;
+  }
+}
+
+function startSync(){
+  if(syncTimer)clearInterval(syncTimer);
+  syncTimer=setInterval(syncNow,10000);
+  window.addEventListener('focus',syncNow);
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')syncNow()});
+}
+
+function stopSync(){
+  if(syncTimer)clearInterval(syncTimer);
+  syncTimer=null;
+}
+
 function updateSyncUI(){
   const chip=document.getElementById('userChip');
-  if(chip&&currentUser)chip.innerHTML='<span class="sync-dot"></span>Synced';
+  if(chip&&currentUser)chip.innerHTML='<span class="sync-dot"></span>Auto-synced';
 }
 
 function showAuthError(msg){const el=document.getElementById('authError');el.textContent=msg;el.style.display='block'}
@@ -686,6 +725,7 @@ async function enterApp(user){
   await loadTransactions();
   renderNav();render();
   updateSyncUI();
+  startSync();
   enteringUserId=null;
 }
 sb.auth.onAuthStateChange(async(event,session)=>{
@@ -693,6 +733,7 @@ sb.auth.onAuthStateChange(async(event,session)=>{
     // Avoid doing heavy async work inside the auth callback itself.
     setTimeout(()=>enterApp(session.user),0);
   }else{
+    stopSync();
     currentUser=null;
     document.getElementById('authScreen').style.display='flex';
     document.getElementById('loginPassword').value='';

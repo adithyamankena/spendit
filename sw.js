@@ -1,4 +1,4 @@
-const CACHE = "spendit-v6";
+const CACHE = "spendit-v7";
 const CORE = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", event => {
@@ -15,26 +15,18 @@ self.addEventListener("activate", event => {
 self.addEventListener("fetch", event => {
   if (event.request.method !== "GET") return;
   const url = new URL(event.request.url);
-  const isNavigation = event.request.mode === "navigate" || url.pathname.endsWith("/index.html") || url.pathname === "/spendit/";
+  const sameOrigin = url.origin === self.location.origin;
 
-  if (isNavigation) {
+  // Always prefer the live website for HTML/manifest/app files so updates
+  // are not stuck behind an old service-worker cache.
+  if (sameOrigin) {
     event.respondWith(
       fetch(event.request, {cache: "no-store"})
         .then(response => {
-          if (response.ok) caches.open(CACHE).then(cache => cache.put("./index.html", response.clone()));
+          if (response.ok) caches.open(CACHE).then(cache => cache.put(event.request, response.clone()));
           return response;
         })
-        .catch(() => caches.match("./index.html"))
+        .catch(() => caches.match(event.request).then(cached => cached || caches.match("./index.html")))
     );
-    return;
   }
-
-  event.respondWith(
-    caches.match(event.request).then(cached => cached || fetch(event.request).then(response => {
-      if (response.ok && url.origin === self.location.origin) {
-        caches.open(CACHE).then(cache => cache.put(event.request, response.clone()));
-      }
-      return response;
-    }))
-  );
 });
