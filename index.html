@@ -426,63 +426,75 @@ function render(){
 }
 function periodOptions(){
   const months={};
-  state.transactions.forEach(t=>{if(t.date)months[t.date.slice(0,7)]=1});
-  const now=new Date();months[now.toISOString().slice(0,7)]=1;
-  for(let i=1;i<12;i++){const d=new Date(now.getFullYear(),now.getMonth()-i,1);months[d.toISOString().slice(0,7)]=1}
-  return Object.keys(months).sort().reverse();
+  state.transactions.forEach(t=>{if(t.date&&/^\d{4}-\d{2}/.test(t.date))months[t.date.slice(0,7)]=1});
+  const now=new Date();
+  const currentKey=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  months[currentKey]=1;
+  for(let i=1;i<12;i++){const d=new Date(now.getFullYear(),now.getMonth()-i,1);const key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;months[key]=1}
+  const list=Object.keys(months).sort().reverse();
+  return ['all',...list];
 }
-function monthLabel(k){const [y,m]=k.split('-');return new Date(+y,+m-1,1).toLocaleDateString('en-IN',{month:'long',year:'numeric'})}
-function monthSelect(){return `<select class="period" onchange="selectedMonth=this.value;render()">${periodOptions().map(m=>`<option value="${m}" ${m===selectedMonth?'selected':''}>${monthLabel(m)}</option>`).join('')}</select>`}
-function monthlyTransactions(){return state.transactions.filter(t=>t.date&&t.date.slice(0,7)===selectedMonth).sort((a,b)=>b.date.localeCompare(a.date))}
+function monthLabel(k){
+  if(k==='all')return 'All time';
+  const [y,m]=k.split('-');
+  return new Date(+y,+m-1,1).toLocaleDateString('en-IN',{month:'long',year:'numeric'});
+}
+function monthSelect(){return `<select class="period" aria-label="Select period" onchange="selectedMonth=this.value;render()">${periodOptions().map(m=>`<option value="${m}" ${m===selectedMonth?'selected':''}>${monthLabel(m)}</option>`).join('')}</select>`}
+function monthlyTransactions(){
+  return state.transactions.filter(t=>t.date&&(selectedMonth==='all'||t.date.slice(0,7)===selectedMonth)).sort((a,b)=>b.date.localeCompare(a.date));
+}
 function totals(arr){const income=arr.filter(t=>t.type==='income').reduce((s,t)=>s+Number(t.amount),0),spend=arr.filter(t=>t.type==='expense').reduce((s,t)=>s+Number(t.amount),0);return {income,spend,rate:income?((income-spend)/income)*100:0}}
 
 function dashboard(){
   const arr=monthlyTransactions();
   const t=totals(arr);
-  const monthName=new Date(selectedMonth+'-01T00:00:00').toLocaleDateString('en-IN',{month:'long',year:'numeric'});
-  const recent=[...arr].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5);
+  const periodName=monthLabel(selectedMonth);
+  const recent=arr.slice(0,5);
 
-  // Keep the existing dashboard charts unchanged; only the top summary is
-  // switched to the selected/current month's real transaction totals.
-  const allArr=state.transactions;
+  // Category breakdown is always derived from the currently selected period.
   const cats={};
-  allArr.filter(x=>x.type==='expense').forEach(x=>cats[x.category]=(cats[x.category]||0)+Number(x.amount));
-  const max=Math.max(...Object.values(cats),1);
+  arr.filter(x=>x.type==='expense').forEach(x=>cats[x.category]=(cats[x.category]||0)+Number(x.amount));
+  const catEntries=Object.entries(cats).sort((a,b)=>b[1]-a[1]);
+  const max=Math.max(...catEntries.map(([,v])=>v),1);
 
-  return `<div class="page-head"><div><h1>Your Data</h1><div class="hint">Private cloud-synced money snapshot</div></div></div>
+  // Seven-point cash-flow chart. For a selected month, show daily flow for that
+  // month; for All time, show the latest seven months.
+  const cashPoints=[];
+  if(selectedMonth==='all'){
+    const monthMap={};
+    state.transactions.forEach(x=>{if(!x.date)return;const k=x.date.slice(0,7);if(!monthMap[k])monthMap[k]={income:0,spend:0};if(x.type==='income')monthMap[k].income+=Number(x.amount);else if(x.type==='expense')monthMap[k].spend+=Number(x.amount)});
+    Object.keys(monthMap).sort().slice(-7).forEach(k=>cashPoints.push({label:monthLabel(k).split(' ')[0].slice(0,3),income:monthMap[k].income,spend:monthMap[k].spend}));
+  }else{
+    const dayMap={};
+    arr.forEach(x=>{if(!dayMap[x.date])dayMap[x.date]={income:0,spend:0};if(x.type==='income')dayMap[x.date].income+=Number(x.amount);else if(x.type==='expense')dayMap[x.date].spend+=Number(x.amount)});
+    Object.keys(dayMap).sort().slice(-7).forEach(k=>cashPoints.push({label:k.slice(8,10),income:dayMap[k].income,spend:dayMap[k].spend}));
+  }
+  const cashMax=Math.max(...cashPoints.flatMap(p=>[p.income,p.spend]),1);
+
+  return `<div class="page-head">
+    <div><h1>Your Data</h1><div class="hint">Private cloud-synced money snapshot</div></div>
+    <div style="display:flex;gap:9px;align-items:center;flex-wrap:wrap">${monthSelect()}</div>
+  </div>
 
   <section class="section" style="margin-bottom:16px">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
-      <div>
-        <div class="label">THIS MONTH</div>
-        <h2 style="margin:4px 0 0">${monthName}</h2>
-      </div>
+      <div><div class="label">SELECTED PERIOD</div><h2 style="margin:4px 0 0">${periodName}</h2></div>
       <div class="hint" style="font-weight:600">Income − Spending = Remaining</div>
     </div>
     <div class="cards" style="margin-top:14px">
-      <div class="card">
-        <div class="label">💰 INCOME</div>
-        <div class="value">${money(t.income)}</div>
-        <div class="hint">${monthName}</div>
-      </div>
-      <div class="card">
-        <div class="label">💸 SPENDING</div>
-        <div class="value">${money(t.spend)}</div>
-        <div class="hint">${monthName}</div>
-      </div>
-      <div class="card">
-        <div class="label">💚 REMAINING</div>
-        <div class="value">${money(t.income-t.spend)}</div>
-        <div class="hint">Income − Spending</div>
-      </div>
+      <div class="card"><div class="label">💰 INCOME</div><div class="value">${money(t.income)}</div><div class="hint">${periodName}</div></div>
+      <div class="card"><div class="label">💸 SPENDING</div><div class="value">${money(t.spend)}</div><div class="hint">${periodName}</div></div>
+      <div class="card"><div class="label">💚 REMAINING</div><div class="value">${money(t.income-t.spend)}</div><div class="hint">Income − Spending</div></div>
+      <div class="card"><div class="label">SAVINGS RATE</div><div class="value">${t.rate.toFixed(1)}%</div><div class="hint">For ${periodName}</div></div>
     </div>
   </section>
 
   <div class="grid2">
-   <section class="section"><h2>Spending vibe 📊</h2>${Object.keys(cats).length?`<div class="bar-wrap">${Object.entries(cats).slice(0,7).map(([k,v])=>`<div class="bar" style="height:${Math.max(7,(v/max)*175)}px"><span>${esc(k)}</span></div>`).join('')}</div>`:`<div class="empty">No spending data yet.<br>Add an expense to start your dashboard.</div>`}</section>
-   <section class="section"><h2>Top spending</h2>${Object.keys(cats).length?Object.entries(cats).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([k,v])=>`<div class="statrow"><span>${esc(k)}</span><strong>${money(v)}</strong></div>`).join(''):`<div class="empty">Nothing to show yet.</div>`}</section>
+    <section class="section"><h2>Cash flow</h2>${cashPoints.length?`<div class="bar-wrap">${cashPoints.map(p=>`<div class="bar" style="height:${Math.max(7,((p.income+p.spend)/cashMax)*175)}px"><span>${esc(p.label)}</span></div>`).join('')}</div><div class="hint" style="margin-top:4px">Income and spending activity for the selected period.</div>`:`<div class="empty">No transaction data for ${esc(periodName)}.</div>`}</section>
+    <section class="section"><h2>Spending by category</h2>${catEntries.length?catEntries.slice(0,8).map(([k,v])=>`<div class="statrow"><span>${esc(k)}</span><strong>${money(v)}</strong></div>`).join(''):`<div class="empty">No spending data for ${esc(periodName)}.</div>`}</section>
   </div>
-  <section class="section" style="margin-top:16px"><h2>Recent activity</h2>${recent.length?`<div style="overflow:auto"><table><thead><tr><th>Date</th><th>Source / Merchant</th><th>Category</th><th>Bank</th><th>Payment method</th><th>Amount</th><th></th></tr></thead><tbody>${recent.map(txRow).join('')}</tbody></table></div>`:`<div class="empty">No transactions recorded for ${monthName}. Use <b style="margin:0 4px">+ Add income</b> or <b style="margin-left:4px">+ Add expense</b>.</div>`}</section>`;
+
+  <section class="section" style="margin-top:16px"><h2>Recent activity</h2>${recent.length?`<div style="overflow:auto"><table><thead><tr><th>Date</th><th>Source / Merchant</th><th>Category</th><th>Bank</th><th>Payment method</th><th>Amount</th><th></th></tr></thead><tbody>${recent.map(txRow).join('')}</tbody></table></div>`:`<div class="empty">No transactions recorded for ${esc(periodName)}. Use <b style="margin:0 4px">+ Add income</b> or <b style="margin-left:4px">+ Add expense</b>.</div>`}</section>`;
 }
 
 function txRow(t){
@@ -492,7 +504,7 @@ function txRow(t){
 
 function transactions(){
   const arr=monthlyTransactions(),t=totals(arr);
-  return `<div class="page-head"><div><h1>Transactions</h1><div class="hint">Complete transaction history for the selected month.</div></div><div style="display:flex;gap:9px;align-items:center">${monthSelect()}<button class="btn primary" onclick="openExpense()">+ Add expense</button></div></div>
+  return `<div class="page-head"><div><h1>Transactions</h1><div class="hint">Complete transaction history for the selected period.</div></div><div style="display:flex;gap:9px;align-items:center">${monthSelect()}<button class="btn primary" onclick="openExpense()">+ Add expense</button></div></div>
   <div class="cards" style="margin-bottom:16px">
    <div class="card"><div class="label">MONTH INCOME</div><div class="value">${money(t.income)}</div><div class="hint">${monthLabel(selectedMonth)}</div></div>
    <div class="card"><div class="label">MONTH SPENDING</div><div class="value">${money(t.spend)}</div><div class="hint">${monthLabel(selectedMonth)}</div></div>
@@ -506,7 +518,7 @@ function transactions(){
 function filterTx(){const q=(txSearch.value||'').toLowerCase(),b=txBank.value;document.querySelectorAll('#txTable tbody tr').forEach(r=>{r.style.display=(!q||r.textContent.toLowerCase().includes(q))&&(!b||r.children[3].textContent===b)?'':'none'})}
 
 function income(){
-  const arr=state.transactions.filter(t=>t.type==='income'&&t.date.slice(0,7)===selectedMonth);
+  const arr=state.transactions.filter(t=>t.type==='income'&&t.date&&(selectedMonth==='all'||t.date.slice(0,7)===selectedMonth));
   return `<div class="page-head"><div><h1>Income 💚</h1><div class="hint">Track incoming money and exactly where it is stored.</div></div><div style="display:flex;gap:9px;align-items:center">${monthSelect()}<button class="btn primary" onclick="openIncome()">+ Add income</button></div></div>
   <section class="section"><div style="overflow:auto"><table><thead><tr><th>Date</th><th>Received from</th><th>Bank</th><th>Payment method</th><th>Category</th><th>Amount</th><th></th></tr></thead><tbody>${arr.map(txRow).join('')}</tbody></table></div>${!arr.length?`<div class="empty">No income for ${monthLabel(selectedMonth)}.</div>`:''}</section>`;
 }
