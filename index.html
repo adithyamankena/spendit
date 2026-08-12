@@ -1351,6 +1351,70 @@ body{background:#EEF2F0!important;color:#000!important}
 }
 </style>
 
+
+<style>
+/* Change 8 — black background + white text */
+html, body{
+  background:#000000!important;
+  color:#ffffff!important;
+}
+
+/* Main text */
+#content,
+#content h1,#content h2,#content h3,
+#content p,#content .value,#content .label,
+#content .hint,#content th,#content td,
+.content{
+  color:#ffffff!important;
+}
+
+/* Secondary text stays white but slightly muted */
+#content .hint,
+#content .label,
+#content th{
+  color:rgba(255,255,255,.72)!important;
+}
+
+/* Sidebar text */
+.sidebar,
+.sidebar .brand,
+.sidebar .nav button{
+  color:#ffffff!important;
+}
+.sidebar .nav button{
+  color:rgba(255,255,255,.72)!important;
+}
+.sidebar .nav button.active,
+.sidebar .nav button:hover{
+  color:#ffffff!important;
+}
+
+/* Black/glass gaming look */
+.topbar.actions-only,
+.sidebar,
+.card,
+.section{
+  background:rgba(10,10,10,.72)!important;
+  border-color:rgba(255,255,255,.18)!important;
+  box-shadow:
+    0 14px 40px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(255,255,255,.12)!important;
+  backdrop-filter:blur(24px) saturate(140%)!important;
+  -webkit-backdrop-filter:blur(24px) saturate(140%)!important;
+}
+
+/* Inputs/selects */
+select,input,textarea{
+  color:#ffffff!important;
+  background:rgba(255,255,255,.08)!important;
+  border-color:rgba(255,255,255,.18)!important;
+}
+select option{
+  background:#000000!important;
+  color:#ffffff!important;
+}
+</style>
+
 </head>
 <body>
 
