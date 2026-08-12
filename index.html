@@ -331,54 +331,6 @@ button,a,select,input{touch-action:manipulation}
 }
 </style>
 
-
-<style>
-/* SpendIt v13 — category and note form improvements */
-.dialog textarea{
-  width:100%;
-  min-height:82px;
-  resize:vertical;
-  box-sizing:border-box;
-  border:1px solid var(--line);
-  border-radius:12px;
-  padding:12px 13px;
-  background:rgba(255,255,255,.04);
-  color:var(--text);
-  font:inherit;
-  outline:none;
-}
-.dialog textarea:focus{
-  border-color:var(--blue);
-  box-shadow:0 0 0 3px rgba(102,133,255,.12);
-}
-</style>
-
-
-<style>
-/* SpendIt v14 — actions-only top bar */
-.topbar.actions-bar{
-  padding:12px 20px;
-  min-height:0;
-  height:auto;
-  display:flex;
-  justify-content:flex-end;
-  align-items:center;
-}
-.topbar.actions-bar .top-actions{
-  width:auto;
-  margin-left:auto;
-  display:flex;
-  align-items:center;
-  justify-content:flex-end;
-  gap:9px;
-}
-@media(max-width:700px){
-  .topbar.actions-bar{padding:10px 12px;}
-  .topbar.actions-bar .top-actions{width:100%;gap:7px;}
-  .topbar.actions-bar .top-actions .btn{flex:1;min-width:0;padding-left:7px;padding-right:7px;}
-}
-</style>
-
 </head>
 <body>
 
@@ -406,12 +358,15 @@ button,a,select,input{touch-action:manipulation}
  <nav class="nav" id="nav"></nav>
 </aside>
 <main class="main">
- <header class="topbar actions-bar"><span id="userChip" aria-hidden="true" style="display:none"></span>
+ <header class="topbar">
+  <div class="mobile-top-brand">Spend<span>It</span></div>
+  <div class="mobile-top-row"><div class="top-title" id="topTitle">Your Data</div>
   <div class="top-actions">
+   <span class="user-chip" id="userChip"><span class="sync-dot"></span>Syncing</span>
    <button class="btn" onclick="openCSV()">Import CSV</button>
    <button class="btn" onclick="openIncome()">+ Add income</button>
    <button class="btn primary" onclick="openExpense()">+ Add expense</button>
-  </div>
+  </div></div>
  </header>
  <div class="content"><div id="content"></div></div>
 </main>
@@ -437,7 +392,7 @@ const sb = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
 
 const BANKS=['HDFC','SBI','Punjab'];
 const METHODS=['Google Pay','PhonePe','Cash','Account Transfer'];
-const CATEGORIES=['Housing','Groceries','Shopping','Dining','Transportation','Utilities','Subscriptions','Insurance','Health','Entertainment','Income','Other'];
+const CATEGORIES=['Housing','Groceries','Shopping','Dining','Transportation','Utilities','Subscriptions','Insurance','Health','Entertainment','Income','Needs review','Other'];
 
 let state = {
   transactions:[],
@@ -472,6 +427,7 @@ function renderNav(){
 }
 function go(p){page=p;renderNav();render();window.scrollTo({top:0,behavior:'smooth'})}
 function render(){
+  topTitle.textContent=page==='Dashboard'?'Your Data':page;
   const fn={Dashboard:dashboard,Transactions:transactions,Income:income,Recurring:recurring,Subscriptions:subscriptions,Budgets:budgets,Goals:goals,Documents:documents,Rules:rules,Settings:settings}[page];
   content.innerHTML=fn();
 }
@@ -753,7 +709,7 @@ async function importCSV(){
       const date=get(['date']),merchant=get(['merchant','description','source']),raw=(get(['amount'])||'').replace(/[₹,\s]/g,''),amount=parseFloat(raw);
       if(!date||!merchant||!Number.isFinite(amount)||amount===0)continue;
       rows.push({
-        user_id:currentUser.id,date,merchant,category:get(['category'])||
+        user_id:currentUser.id,date,merchant,category:get(['category'])||'Needs review',
         amount:Math.abs(amount),type:amount>0?'income':'expense',
         bank:get(['bank'])||'HDFC',payment_method:get(['payment_method','payment method','method'])||'Account Transfer',
         notes:get(['notes'])||null
@@ -860,7 +816,7 @@ async function enterApp(user){
   enteringUserId=user.id;
   currentUser=user;
   document.getElementById('authScreen').style.display='none';
-  const chip=document.getElementById('userChip'); if(chip) chip.innerHTML='<span class="sync-dot"></span>Syncing...';
+  document.getElementById('userChip').innerHTML='<span class="sync-dot"></span>Syncing...';
   await loadDashboardTotals(user);
   await loadTransactions();
   renderNav();render();
