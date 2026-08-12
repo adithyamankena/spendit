@@ -464,273 +464,241 @@ button,a,select,input{touch-action:manipulation}
 
 <style>
 /* =========================================================
-   SpendIt Change 7 — Glass / Liquid Dashboard UI
-   Visual-only enhancement. Existing functionality untouched.
+   SpendIt Change 7 — Light Gaming Glass
+   Palette:
+   Background #EEF2F0
+   Glass rgba(255,255,255,.70)
+   Border rgba(255,255,255,.80)
+   Accent #1FA774
+   Text #17201B
    ========================================================= */
+
 :root{
-  --glass-bg:rgba(255,255,255,.075);
-  --glass-bg-strong:rgba(255,255,255,.105);
-  --glass-border:rgba(255,255,255,.18);
-  --glass-highlight:rgba(255,255,255,.24);
-  --glass-shadow:0 18px 55px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.09);
+  --bg:#EEF2F0;
+  --glass:rgba(255,255,255,.70);
+  --glass-strong:rgba(255,255,255,.84);
+  --glass-border:rgba(255,255,255,.80);
+  --accent:#1FA774;
+  --accent-bright:#35D894;
+  --accent-dark:#137C55;
+  --text:#17201B;
+  --muted:#64736B;
+  --danger:#D9535F;
+  --shadow:0 22px 55px rgba(25,55,43,.12),inset 0 1px 0 rgba(255,255,255,.85);
 }
 
-/* Soft luminous background depth */
+/* Base */
+html,body{
+  background:var(--bg)!important;
+  color:var(--text)!important;
+}
 body{
+  overflow-x:hidden;
   background:
-    radial-gradient(circle at 12% 10%,rgba(89,225,255,.13),transparent 30%),
-    radial-gradient(circle at 88% 16%,rgba(255,103,199,.13),transparent 32%),
-    radial-gradient(circle at 50% 100%,rgba(102,133,255,.10),transparent 38%),
-    #080b16 !important;
+    radial-gradient(700px 500px at 5% 5%,rgba(31,167,116,.16),transparent 65%),
+    radial-gradient(600px 460px at 94% 8%,rgba(102,190,154,.13),transparent 65%),
+    radial-gradient(800px 600px at 52% 100%,rgba(255,255,255,.72),transparent 65%),
+    var(--bg)!important;
+}
+body::before{
+  content:"";
+  position:fixed;
+  inset:-12%;
+  z-index:-1;
+  pointer-events:none;
+  background:
+    radial-gradient(260px 220px at 16% 22%,rgba(31,167,116,.15),transparent 72%),
+    radial-gradient(300px 240px at 78% 30%,rgba(255,255,255,.72),transparent 70%),
+    radial-gradient(320px 250px at 48% 78%,rgba(74,198,148,.10),transparent 72%);
+  filter:blur(48px);
+  animation:spenditLightMotion 16s ease-in-out infinite alternate;
+}
+@keyframes spenditLightMotion{
+  from{transform:translate3d(-1%,0,0) scale(1)}
+  to{transform:translate3d(1.5%,1%,0) scale(1.035)}
+}
+
+/* Glass containers */
+.sidebar,
+.topbar.actions-only,
+.card,
+.section,
+.period-summary,
+.summary-panel,
+.modal .dialog,
+.backup-card,
+.backup-status{
+  background:linear-gradient(135deg,rgba(255,255,255,.78),rgba(255,255,255,.58))!important;
+  border:1px solid var(--glass-border)!important;
+  box-shadow:var(--shadow)!important;
+  backdrop-filter:blur(28px) saturate(145%)!important;
+  -webkit-backdrop-filter:blur(28px) saturate(145%)!important;
+}
+
+/* Gaming-style glass edge */
+.sidebar::after,
+.topbar.actions-only::after,
+.card::after,
+.section::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  border-radius:inherit;
+  background:
+    linear-gradient(115deg,rgba(255,255,255,.72),transparent 20%,transparent 72%,rgba(31,167,116,.08)),
+    linear-gradient(180deg,rgba(255,255,255,.42),transparent 32%);
+  mix-blend-mode:screen;
+  opacity:.72;
+}
+
+/* Make glass elements able to host the highlight */
+.sidebar,.topbar.actions-only,.card,.section{position:relative;overflow:hidden}
+
+/* Green gaming glow / active energy */
+.nav button.active{
+  color:#fff!important;
+  background:linear-gradient(105deg,#1FA774,#28BD84)!important;
+  border-color:rgba(255,255,255,.65)!important;
+  box-shadow:
+    0 0 0 1px rgba(31,167,116,.15),
+    0 10px 28px rgba(31,167,116,.24),
+    0 0 28px rgba(31,167,116,.16),
+    inset 0 1px 0 rgba(255,255,255,.38)!important;
+}
+.nav button:hover{
+  color:var(--text)!important;
+  background:rgba(31,167,116,.09)!important;
+  box-shadow:0 8px 24px rgba(31,167,116,.10);
 }
 
 /* Header */
+.site-brand{
+  color:var(--text)!important;
+}
+.site-brand span{
+  background:linear-gradient(90deg,#137C55,#1FA774,#35D894)!important;
+  -webkit-background-clip:text!important;
+  background-clip:text!important;
+  color:transparent!important;
+}
 .topbar.actions-only{
-  background:linear-gradient(110deg,rgba(44,75,96,.42),rgba(69,45,91,.36)) !important;
-  border:1px solid var(--glass-border) !important;
-  box-shadow:var(--glass-shadow) !important;
-  backdrop-filter:blur(24px) saturate(150%);
-  -webkit-backdrop-filter:blur(24px) saturate(150%);
-}
-
-/* Sidebar / navigation becomes translucent glass */
-.sidebar{
-  background:linear-gradient(160deg,rgba(42,71,88,.62),rgba(20,25,45,.62)) !important;
-  border-right:1px solid var(--glass-border) !important;
-  box-shadow:12px 0 45px rgba(0,0,0,.20),inset -1px 0 0 rgba(255,255,255,.06);
-  backdrop-filter:blur(28px) saturate(145%);
-  -webkit-backdrop-filter:blur(28px) saturate(145%);
-}
-
-/* Main dashboard sections/cards */
-.section,
-.summary,
-.card,
-.stat,
-.kpi,
-.dashboard-card,
-.metric,
-.chart-card{
-  background:linear-gradient(135deg,rgba(255,255,255,.095),rgba(255,255,255,.045)) !important;
-  border:1px solid var(--glass-border) !important;
-  box-shadow:var(--glass-shadow) !important;
-  backdrop-filter:blur(22px) saturate(145%);
-  -webkit-backdrop-filter:blur(22px) saturate(145%);
-}
-
-/* Dashboard selected-period summary */
-.period-summary,
-.summary-panel{
-  background:linear-gradient(135deg,rgba(70,91,115,.42),rgba(87,50,104,.34)) !important;
-  border:1px solid var(--glass-border) !important;
-  box-shadow:0 20px 60px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.10) !important;
-  backdrop-filter:blur(26px) saturate(155%);
-  -webkit-backdrop-filter:blur(26px) saturate(155%);
+  box-shadow:
+    0 18px 48px rgba(25,55,43,.13),
+    inset 0 1px 0 rgba(255,255,255,.9),
+    0 0 32px rgba(31,167,116,.06)!important;
 }
 
 /* Buttons */
 .btn{
-  border:1px solid rgba(255,255,255,.18) !important;
-  box-shadow:0 8px 25px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.10) !important;
-  backdrop-filter:blur(16px);
-  -webkit-backdrop-filter:blur(16px);
-}
-
-/* Form controls / selectors */
-input,select,textarea{
-  background:rgba(255,255,255,.065) !important;
-  border:1px solid rgba(255,255,255,.16) !important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.06) !important;
-  backdrop-filter:blur(14px);
-  -webkit-backdrop-filter:blur(14px);
-}
-
-/* Table / transaction rows */
-table{
-  border-color:rgba(255,255,255,.10) !important;
-}
-tbody tr:hover{
-  background:rgba(255,255,255,.045) !important;
-}
-
-/* Subtle glass sheen */
-.section::before,
-.summary::before,
-.card::before,
-.dashboard-card::before{
-  content:"";
-  position:absolute;
-  pointer-events:none;
-  inset:0;
-  border-radius:inherit;
-  background:linear-gradient(120deg,rgba(255,255,255,.075),transparent 28%,transparent 70%,rgba(255,255,255,.025));
-  opacity:.7;
-}
-
-/* Keep sections above their sheen */
-.section,
-.summary,
-.card,
-.dashboard-card{
-  position:relative;
-  overflow:hidden;
-}
-
-/* Mobile glass treatment */
-@media(max-width:700px){
-  body{
-    background:
-      radial-gradient(circle at 20% 8%,rgba(89,225,255,.12),transparent 34%),
-      radial-gradient(circle at 90% 20%,rgba(255,103,199,.11),transparent 35%),
-      #080b16 !important;
-  }
-  .sidebar{
-    background:linear-gradient(160deg,rgba(31,54,69,.78),rgba(16,21,38,.82)) !important;
-  }
-  .topbar.actions-only{
-    backdrop-filter:blur(22px) saturate(145%);
-    -webkit-backdrop-filter:blur(22px) saturate(145%);
-  }
-  .section,
-  .summary,
-  .card,
-  .dashboard-card{
-    backdrop-filter:blur(18px) saturate(140%);
-    -webkit-backdrop-filter:blur(18px) saturate(140%);
-  }
-}
-</style>
-
-
-<style>
-/* Change 7 FIX — stronger visible liquid-glass treatment */
-html,body{background:#070a14!important}
-
-body{
-  position:relative;
-  overflow-x:hidden;
-  background:
-    radial-gradient(700px 500px at 15% 12%,rgba(37,196,235,.28),transparent 62%),
-    radial-gradient(650px 520px at 82% 16%,rgba(224,61,178,.25),transparent 62%),
-    radial-gradient(700px 600px at 55% 92%,rgba(70,94,255,.20),transparent 65%),
-    linear-gradient(135deg,#07111b 0%,#090b18 48%,#130b1d 100%) !important;
-}
-
-body::before{
-  content:"";
-  position:fixed;
-  inset:-15%;
-  z-index:-1;
-  pointer-events:none;
-  background:
-    radial-gradient(320px 280px at 22% 28%,rgba(79,225,255,.20),transparent 70%),
-    radial-gradient(360px 300px at 75% 35%,rgba(255,89,199,.18),transparent 70%),
-    radial-gradient(420px 330px at 48% 78%,rgba(96,105,255,.16),transparent 70%);
-  filter:blur(55px);
-  animation:spenditGlassGlow 18s ease-in-out infinite alternate;
-}
-@keyframes spenditGlassGlow{
-  from{transform:translate3d(-1%,0,0) scale(1)}
-  to{transform:translate3d(1.5%,1%,0) scale(1.04)}
-}
-
-/* Main header glass */
-.topbar.actions-only{
-  background:linear-gradient(110deg,rgba(50,93,117,.34),rgba(108,55,111,.30))!important;
-  border:1px solid rgba(255,255,255,.24)!important;
-  box-shadow:0 22px 60px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.18),inset 0 -1px rgba(255,255,255,.05)!important;
-  backdrop-filter:blur(30px) saturate(180%)!important;
-  -webkit-backdrop-filter:blur(30px) saturate(180%)!important;
-}
-
-/* Sidebar glass */
-.sidebar{
-  background:linear-gradient(160deg,rgba(48,85,105,.48),rgba(30,26,55,.44))!important;
-  border:1px solid rgba(255,255,255,.22)!important;
-  box-shadow:18px 25px 75px rgba(0,0,0,.38),inset 1px 1px 0 rgba(255,255,255,.14)!important;
-  backdrop-filter:blur(32px) saturate(175%)!important;
-  -webkit-backdrop-filter:blur(32px) saturate(175%)!important;
-}
-
-/* Actual SpendIt dashboard cards */
-.cards .card,
-.card{
-  position:relative;
-  overflow:hidden;
-  background:
-    linear-gradient(135deg,rgba(255,255,255,.155),rgba(255,255,255,.055) 55%,rgba(255,255,255,.09))!important;
-  border:1px solid rgba(255,255,255,.27)!important;
+  color:var(--text)!important;
+  background:rgba(255,255,255,.62)!important;
+  border:1px solid rgba(255,255,255,.92)!important;
   box-shadow:
-    0 24px 65px rgba(0,0,0,.34),
-    inset 0 1px 0 rgba(255,255,255,.22),
-    inset 0 -1px 0 rgba(255,255,255,.06)!important;
-  backdrop-filter:blur(32px) saturate(190%)!important;
-  -webkit-backdrop-filter:blur(32px) saturate(190%)!important;
+    0 9px 25px rgba(25,55,43,.10),
+    inset 0 1px 0 rgba(255,255,255,.95)!important;
 }
-
-/* Actual SpendIt dashboard sections/charts */
-.section{
-  position:relative;
-  overflow:hidden;
-  background:
-    linear-gradient(135deg,rgba(255,255,255,.135),rgba(255,255,255,.045) 58%,rgba(255,255,255,.075))!important;
-  border:1px solid rgba(255,255,255,.25)!important;
+.btn:hover{
+  transform:translateY(-2px);
+  background:rgba(255,255,255,.84)!important;
   box-shadow:
-    0 24px 70px rgba(0,0,0,.34),
-    inset 0 1px 0 rgba(255,255,255,.20),
-    inset 0 -1px 0 rgba(255,255,255,.05)!important;
-  backdrop-filter:blur(30px) saturate(185%)!important;
-  -webkit-backdrop-filter:blur(30px) saturate(185%)!important;
+    0 13px 30px rgba(25,55,43,.13),
+    0 0 22px rgba(31,167,116,.10),
+    inset 0 1px 0 #fff!important;
+}
+.btn.primary{
+  color:#fff!important;
+  background:linear-gradient(135deg,#137C55,#1FA774 58%,#35D894)!important;
+  border-color:rgba(255,255,255,.70)!important;
+  box-shadow:
+    0 12px 30px rgba(31,167,116,.28),
+    0 0 24px rgba(31,167,116,.15),
+    inset 0 1px 0 rgba(255,255,255,.40)!important;
 }
 
-/* Bright glass edge / reflection */
-.cards .card::before,
-.section::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  border-radius:inherit;
-  background:
-    linear-gradient(115deg,rgba(255,255,255,.16),transparent 22%,transparent 70%,rgba(255,255,255,.045)),
-    radial-gradient(420px 100px at 18% 0%,rgba(255,255,255,.12),transparent 70%);
-  opacity:.9;
-  z-index:0;
+/* Cards */
+.card:hover{
+  transform:translateY(-4px);
+  box-shadow:
+    0 28px 62px rgba(25,55,43,.16),
+    0 0 26px rgba(31,167,116,.07),
+    inset 0 1px 0 rgba(255,255,255,.92)!important;
 }
-.cards .card>*,
-.section>*{position:relative;z-index:1}
+.value{color:var(--text)!important}
+.label{color:#617069!important}
 
-/* Selected-period summary becomes a premium glass panel */
-.period-summary,
-.summary-panel{
-  background:linear-gradient(135deg,rgba(75,100,127,.36),rgba(103,54,111,.30))!important;
-  border:1px solid rgba(255,255,255,.27)!important;
-  box-shadow:0 28px 75px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.20)!important;
-  backdrop-filter:blur(34px) saturate(195%)!important;
-  -webkit-backdrop-filter:blur(34px) saturate(195%)!important;
+/* Remaining / positive numbers */
+.income{color:var(--accent-dark)!important}
+.expense{color:var(--text)!important}
+
+/* Charts: keep gaming energy but in the green palette */
+.spend-fill{
+  background:linear-gradient(90deg,#1FA774,#35D894)!important;
+  box-shadow:0 0 12px rgba(31,167,116,.20);
+}
+.spend-row.active .spend-fill{
+  background:linear-gradient(90deg,#137C55,#35D894)!important;
+}
+.spend-donut{
+  box-shadow:0 0 32px rgba(31,167,116,.16)!important;
 }
 
-/* Glass controls */
-.period,input,select{
-  background:rgba(255,255,255,.095)!important;
-  border:1px solid rgba(255,255,255,.22)!important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 8px 25px rgba(0,0,0,.12)!important;
-  backdrop-filter:blur(20px) saturate(170%)!important;
-  -webkit-backdrop-filter:blur(20px) saturate(170%)!important;
+/* Controls */
+.period,input,select,textarea{
+  color:var(--text)!important;
+  background:rgba(255,255,255,.62)!important;
+  border:1px solid rgba(255,255,255,.88)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 7px 20px rgba(25,55,43,.07)!important;
+  backdrop-filter:blur(18px)!important;
+  -webkit-backdrop-filter:blur(18px)!important;
+}
+input::placeholder{color:#7B8881!important}
+input:focus,select:focus,textarea:focus{
+  border-color:rgba(31,167,116,.50)!important;
+  box-shadow:
+    0 0 0 3px rgba(31,167,116,.10),
+    0 10px 24px rgba(25,55,43,.08)!important;
+}
+
+/* Tables */
+th{color:#68766F!important}
+th,td{border-bottom-color:rgba(23,32,27,.08)!important}
+tbody tr:hover{background:rgba(31,167,116,.055)!important}
+
+/* Green progress / status accents */
+.backup-icon{
+  color:var(--accent-dark)!important;
+  background:rgba(31,167,116,.10)!important;
+  border-color:rgba(31,167,116,.18)!important;
 }
 
 /* Mobile */
 @media(max-width:700px){
-  body::before{filter:blur(42px)}
+  body{
+    background:
+      radial-gradient(440px 320px at 0% 0%,rgba(31,167,116,.14),transparent 68%),
+      radial-gradient(420px 320px at 100% 12%,rgba(255,255,255,.78),transparent 68%),
+      var(--bg)!important;
+  }
+  .sidebar{
+    background:rgba(255,255,255,.76)!important;
+    backdrop-filter:blur(26px) saturate(145%)!important;
+    -webkit-backdrop-filter:blur(26px) saturate(145%)!important;
+  }
   .topbar.actions-only{
-    background:linear-gradient(110deg,rgba(50,93,117,.40),rgba(108,55,111,.34))!important;
-    backdrop-filter:blur(26px) saturate(175%)!important;
-    -webkit-backdrop-filter:blur(26px) saturate(175%)!important;
+    background:rgba(255,255,255,.72)!important;
   }
-  .cards .card,.section{
-    backdrop-filter:blur(25px) saturate(175%)!important;
-    -webkit-backdrop-filter:blur(25px) saturate(175%)!important;
+  .card,.section{
+    background:linear-gradient(135deg,rgba(255,255,255,.80),rgba(255,255,255,.62))!important;
+    backdrop-filter:blur(24px) saturate(145%)!important;
+    -webkit-backdrop-filter:blur(24px) saturate(145%)!important;
   }
+}
+
+/* Respect reduced motion */
+@media(prefers-reduced-motion:reduce){
+  body::before{animation:none}
+  .card:hover,.btn:hover{transform:none}
 }
 </style>
 
