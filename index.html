@@ -702,6 +702,171 @@ tbody tr:hover{background:rgba(31,167,116,.055)!important}
 }
 </style>
 
+
+<style>
+/* Change 7 FIX — black text + tighter dashboard spacing */
+:root{
+  --text:#000000!important;
+  --muted:#3f4a45!important;
+  --accent:#1FA774!important;
+}
+
+/* Make all primary text truly black */
+body,
+h1,h2,h3,h4,h5,h6,
+p,span,div,
+label,
+button,
+select,
+input,
+textarea,
+th,td,
+.value,.label,
+.site-brand,
+.page-head,
+.hint{
+  color:#000000;
+}
+
+/* Preserve green for the SpendIt accent/logo and positive action elements */
+.site-brand span{
+  color:transparent!important;
+  background:linear-gradient(90deg,#137C55,#1FA774,#35D894)!important;
+  -webkit-background-clip:text!important;
+  background-clip:text!important;
+}
+.btn.primary,
+.nav button.active{
+  color:#fff!important;
+}
+
+/* Reduce the oversized gaps throughout the dashboard */
+.main{
+  gap:12px!important;
+}
+.content{
+  padding-top:10px!important;
+  padding-bottom:18px!important;
+}
+.page-head{
+  margin-bottom:10px!important;
+}
+.section{
+  margin-top:10px!important;
+  margin-bottom:10px!important;
+}
+.cards{
+  gap:10px!important;
+  margin-top:8px!important;
+  margin-bottom:10px!important;
+}
+.card{
+  padding:18px!important;
+}
+.section{
+  padding:18px!important;
+}
+
+/* Selected-period panel tighter */
+.period-summary,
+.summary-panel{
+  padding:16px!important;
+  margin-top:8px!important;
+  margin-bottom:10px!important;
+}
+.period-summary .cards,
+.summary-panel .cards{
+  margin-top:8px!important;
+}
+
+/* Chart/category row uses the available width with minimal separation */
+.dashboard-grid,
+.charts-grid,
+.two-col,
+.grid-2{
+  gap:10px!important;
+}
+.dashboard-grid > *,
+.charts-grid > *,
+.two-col > *,
+.grid-2 > *{
+  min-width:0;
+}
+
+/* Header is compact */
+.topbar.actions-only{
+  margin-bottom:8px!important;
+}
+
+/* Sidebar */
+.sidebar{
+  padding-top:12px!important;
+  padding-bottom:12px!important;
+}
+.nav{
+  gap:5px!important;
+}
+.nav button{
+  padding-top:10px!important;
+  padding-bottom:10px!important;
+}
+
+/* Stronger glass but cleaner, less washed-out */
+body{
+  color:#000!important;
+}
+.topbar.actions-only,
+.sidebar,
+.card,
+.section,
+.period-summary,
+.summary-panel{
+  background:rgba(255,255,255,.70)!important;
+  border-color:rgba(255,255,255,.88)!important;
+  box-shadow:
+    0 14px 36px rgba(0,0,0,.10),
+    inset 0 1px 0 rgba(255,255,255,.95)!important;
+  backdrop-filter:blur(24px) saturate(140%)!important;
+  -webkit-backdrop-filter:blur(24px) saturate(140%)!important;
+}
+
+/* Remove excess internal whitespace in common dashboard sections */
+.section > :last-child{
+  margin-bottom:0!important;
+}
+.section h2,
+.section h3{
+  margin-top:0!important;
+  margin-bottom:10px!important;
+}
+
+/* Mobile: compact without crowding */
+@media(max-width:700px){
+  .content{
+    padding-top:8px!important;
+    padding-bottom:10px!important;
+  }
+  .page-head{
+    margin-bottom:8px!important;
+  }
+  .cards{
+    gap:8px!important;
+  }
+  .card{
+    padding:14px!important;
+  }
+  .section{
+    padding:14px!important;
+    margin-top:8px!important;
+    margin-bottom:8px!important;
+  }
+  .period-summary,
+  .summary-panel{
+    padding:12px!important;
+  }
+}
+</style>
+
 </head>
 <body>
 
