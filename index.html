@@ -867,6 +867,133 @@ body{
 }
 </style>
 
+
+<style>
+/* Change 7 FIXED2 — eliminate dashboard whitespace using the actual layout */
+html,body{background:#EEF2F0!important;color:#000!important}
+body{overflow-x:hidden}
+
+/* Main shell: no unnecessary vertical padding */
+.main{
+  padding:8px 10px 14px!important;
+}
+.content{
+  max-width:1500px!important;
+  padding:8px 4px 12px!important;
+}
+.page-head{
+  margin-bottom:6px!important;
+  min-height:0!important;
+}
+.page-head h1{
+  margin:0!important;
+}
+
+/* Dashboard sections sit directly against each other */
+#content > .section{
+  margin-top:0!important;
+  margin-bottom:6px!important;
+}
+#content > .grid2{
+  margin-top:6px!important;
+  margin-bottom:6px!important;
+  gap:8px!important;
+}
+#content > .grid2 + *{
+  margin-top:6px!important;
+}
+
+/* The first dashboard section has inline margin-bottom:16px;
+   this selector deliberately overrides it. */
+#content > section.section[style]{
+  margin-bottom:6px!important;
+}
+
+/* Tighten the selected-period panel */
+#content > .section{
+  padding:14px!important;
+}
+#content > .section > .cards{
+  margin-top:8px!important;
+}
+.cards{
+  gap:8px!important;
+}
+.card{
+  padding:14px!important;
+  border-radius:18px!important;
+}
+
+/* Tighten chart/category panels */
+.grid2 .section{
+  padding:14px!important;
+}
+.section h2{
+  margin:0 0 8px!important;
+}
+
+/* Remove accidental bottom spacing from common children */
+#content > *:last-child{
+  margin-bottom:0!important;
+}
+#content .section p:last-child,
+#content .section table:last-child{
+  margin-bottom:0!important;
+}
+
+/* Keep the glass style but reduce the washed-out empty look */
+.topbar.actions-only,
+.sidebar,
+.card,
+.section,
+.period-summary,
+.summary-panel{
+  background:rgba(255,255,255,.70)!important;
+  border:1px solid rgba(255,255,255,.80)!important;
+  box-shadow:0 10px 28px rgba(0,0,0,.08),inset 0 1px 0 rgba(255,255,255,.95)!important;
+  backdrop-filter:blur(24px) saturate(145%)!important;
+  -webkit-backdrop-filter:blur(24px) saturate(145%)!important;
+}
+
+/* Requested black text */
+body,
+#content,
+#content h1,#content h2,#content h3,
+#content .value,#content .label,
+#content .hint,#content p,
+#content th,#content td,
+select,input,textarea{
+  color:#000!important;
+}
+
+/* Keep primary/active controls readable */
+.btn.primary,
+.nav button.active{
+  color:#fff!important;
+}
+
+/* Mobile: remove vertical dead space without making cards cramped */
+@media(max-width:700px){
+  .main{padding:5px 6px 10px!important}
+  .content{padding:5px 2px 8px!important}
+  .page-head{margin-bottom:5px!important}
+  #content > .section,
+  #content > section.section[style]{
+    margin-top:0!important;
+    margin-bottom:5px!important;
+    padding:11px!important;
+  }
+  #content > .grid2{
+    margin-top:5px!important;
+    margin-bottom:5px!important;
+    gap:6px!important;
+  }
+  .cards{gap:6px!important}
+  .card{padding:11px!important;border-radius:16px!important}
+  .grid2 .section{padding:11px!important}
+}
+</style>
+
 </head>
 <body>
 
