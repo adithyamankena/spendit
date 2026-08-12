@@ -1,39 +1,44 @@
-SPENDIT V7 — ONLY REQUESTED CHANGES
+SPENDIT V11 — PERMANENT SYNC FIX
 
-1. Left navigation now shows only:
-   Dashboard
-   Transactions
-   Income
-   Documents
-   Settings
+ROOT CAUSE FIX:
+Previous versions stored dashboard totals in Supabase Auth user metadata.
+That was the weak point for reliable cross-device synchronization.
 
-   Removed from the left navigation:
-   Goals, Rules, Budgets, Recurring, Subscriptions
+V11 stores dashboard totals in a dedicated public.dashboard_totals table
+protected by RLS and uses a Postgres trigger on transactions INSERT.
 
-2. Transaction Edit and Delete buttons are removed from transaction displays.
-   The existing database security is unchanged.
+BEFORE USING V11:
+Run SpendIt_v11_Supabase_SQL.sql once in Supabase SQL Editor.
 
-3. Cloud syncing is made persistent:
-   - Refreshes transaction data and dashboard totals every 10 seconds while open.
-   - Refreshes when the app/tab becomes active.
-   - Refreshes the logged-in user metadata so dashboard totals sync across devices.
-   - Keeps the existing Supabase RLS/authentication setup.
-   - Service worker now always prefers the live GitHub Pages version, avoiding stale cached app code.
+WHAT THE TRIGGER DOES:
+- New income transaction -> increases Total Income.
+- New expense transaction -> increases Total Spending.
+- It does NOT reduce the main tiles if a transaction is deleted.
+- Transactions themselves remain in the existing transactions table.
+- No existing transaction is deleted or modified by this SQL.
 
-NO OTHER DATABASE TABLES OR SETTINGS ARE REQUIRED.
+V11 UI remains exactly as v10:
+- Goals, Rules, Budgets, Recurring, Subscriptions, Documents removed.
+- Edit/Delete buttons removed.
+- SpendIt professional branding retained.
+- Existing authentication retained.
 
-Upload/replace these 5 files in the GitHub repository ROOT:
+UPLOAD/REPLACE THESE 5 GITHUB FILES:
 index.html
 manifest.webmanifest
 sw.js
 icon-192.png
 icon-512.png
 
-Then:
-1. Commit the changes.
-2. Wait 2–5 minutes for GitHub Pages.
-3. Laptop: Ctrl+Shift+R.
-4. Android: completely close SpendIt and reopen it. If it still shows the old UI, uninstall/reinstall the PWA once.
-5. Do not change Supabase RLS policies.
+THEN:
+1. Run the SQL file once in Supabase SQL Editor.
+2. Commit the 5 website files to GitHub.
+3. Wait for GitHub Pages deployment.
+4. Laptop: Ctrl+Shift+R.
+5. Android: completely close and reopen SpendIt.
+6. Test laptop -> Android and Android -> laptop.
 
-Note: cross-device sync refreshes automatically within about 10 seconds while the app is open, and immediately when the app/tab comes back into focus.
+IMPORTANT:
+Do not run the SQL more than once if it already completed successfully.
+Do not delete the existing transactions table.
+Do not change the existing transactions RLS policies.

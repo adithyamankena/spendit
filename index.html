@@ -492,23 +492,64 @@ async function saveExpense(){
 }
 
 async function loadDashboardTotals(user){
-  const meta=user?.user_metadata||{};
+  if(!user?.id)return false;
+  const {data,error}=await sb.from('dashboard_totals')
+    .select('total_income,total_spending')
+    .eq('user_id',user.id)
+    .maybeSingle();
+  if(error){
+    console.error('SpendIt dashboard totals load error:',error);
+    toast('Dashboard totals sync error: '+error.message);
+    return false;
+  }
+  if(data){
+    state.dashboardTotals={
+      income:Number(data.total_income)||0,
+      spending:Number(data.total_spending)||0
+    };
+    return true;
+  }
+
+  // One-time migration of the old metadata totals into the dedicated table.
+  const meta=user.user_metadata||{};
+  const income=Number(meta.spendit_total_income)||0;
+  const spending=Number(meta.spendit_total_spending)||0;
+  const {data:seed,error:seedError}=await sb.from('dashboard_totals')
+    .upsert({user_id:user.id,total_income:income,total_spending:spending},{onConflict:'user_id'})
+    .select('total_income,total_spending')
+    .single();
+  if(seedError){
+    console.error('SpendIt dashboard totals seed error:',seedError);
+    toast('Could not initialize dashboard totals: '+seedError.message);
+    return false;
+  }
   state.dashboardTotals={
-    income:Number(meta.spendit_total_income)||0,
-    spending:Number(meta.spendit_total_spending)||0
+    income:Number(seed.total_income)||0,
+    spending:Number(seed.total_spending)||0
   };
+  return true;
 }
 
 async function saveDashboardTotals(){
   if(!currentUser)return false;
-  const {data,error}=await sb.auth.updateUser({data:{
-    spendit_total_income:Number(state.dashboardTotals.income)||0,
-    spendit_total_spending:Number(state.dashboardTotals.spending)||0
-  }});
-  if(error){console.error('SpendIt totals save error:',error);toast('Transaction saved, but dashboard total could not be updated: '+error.message);return false}
-  const refreshed=await sb.auth.refreshSession();
-  if(!refreshed.error && refreshed.data?.user) currentUser=refreshed.data.user;
-  else if(data?.user) currentUser=data.user;
+  const {data,error}=await sb.from('dashboard_totals')
+    .upsert({
+      user_id:currentUser.id,
+      total_income:Number(state.dashboardTotals.income)||0,
+      total_spending:Number(state.dashboardTotals.spending)||0,
+      updated_at:new Date().toISOString()
+    },{onConflict:'user_id'})
+    .select('total_income,total_spending')
+    .single();
+  if(error){
+    console.error('SpendIt totals save error:',error);
+    toast('Dashboard totals could not be saved: '+error.message);
+    return false;
+  }
+  state.dashboardTotals={
+    income:Number(data.total_income)||0,
+    spending:Number(data.total_spending)||0
+  };
   return true;
 }
 
@@ -531,9 +572,9 @@ async function insertTransaction(payload){
     toast('Could not save: '+(error.message||'Database error'));
     return false;
   }
-  if(payload.type==='income') state.dashboardTotals.income += Number(payload.amount);
-  else state.dashboardTotals.spending += Number(payload.amount);
-  await saveDashboardTotals();
+  // The database trigger updates dashboard_totals atomically when this
+  // transaction is inserted. Do not increment the local totals here.
+  await loadDashboardTotals(currentUser);
   await loadTransactions();
   await syncNow();
   closeModal();selectedMonth=payload.date.slice(0,7);render();
@@ -652,7 +693,7 @@ function settings(){
   return `<div class="page-head"><div><h1>Settings</h1><div class="hint">Signed in as ${esc(currentUser?.email||'')}</div></div><button class="btn" onclick="logout()">Sign out</button></div>
   <section class="section"><h2>Dashboard totals</h2><p class="hint">These two tiles are separate from the transaction list. Adding a transaction increases the relevant tile; deleting or editing a transaction does not reduce these totals.</p><div class="form-grid"><div><label>Total income</label><input id="dashIncome" type="number" min="0" step=".01" value="${Number(state.dashboardTotals.income)||0}"></div><div><label>Total spending</label><input id="dashSpending" type="number" min="0" step=".01" value="${Number(state.dashboardTotals.spending)||0}"></div><div><button class="btn primary" onclick="saveDashboardTotalsFromForm()">Save dashboard totals</button></div></div></section>
   <section class="section" style="margin-top:16px"><h2>Net worth</h2><div class="form-grid"><div><label>Total assets</label><input id="assets" type="number" value="${state.settings.assets}"></div><div><label>Total liabilities</label><input id="liabilities" type="number" value="${state.settings.liabilities}"></div><div><button class="btn primary" onclick="saveNW()">Save</button></div></div></section>
-  <section class="section" style="margin-top:16px"><h2>Data</h2><p class="hint">Transactions are stored securely in your SpendIt Supabase database and sync between devices when you sign in.</p><button class="btn" onclick="backup()">Export current transaction backup</button></section>`;
+  <section class="section" style="margin-top:16px"><h2>Data</h2><p class="hint">Transactions and dashboard totals are stored securely in your SpendIt Supabase database and sync between devices.</p><button class="btn" onclick="backup()">Export current transaction backup</button></section>`;
 }
 async function saveDashboardTotalsFromForm(){
   const income=Number(document.getElementById('dashIncome')?.value);
@@ -673,14 +714,15 @@ async function syncNow(){
   try{
     // Force a fresh Auth session/user fetch so dashboard totals stored
     // in user metadata are refreshed on every device.
-    const refreshed=await sb.auth.refreshSession();
-    if(refreshed.error) throw refreshed.error;
-    const freshUser=refreshed.data?.user;
+    const {data:authData,error:authError}=await sb.auth.getUser();
+    if(authError) throw authError;
+    const freshUser=authData?.user;
     if(!freshUser||freshUser.id!==currentUser.id) return;
 
     currentUser=freshUser;
-    await loadDashboardTotals(freshUser);
+    const totalsLoaded=await loadDashboardTotals(freshUser);
     const loaded=await loadTransactions(true);
+    if(!totalsLoaded) return;
     if(!loaded) return;
 
     updateSyncUI();
