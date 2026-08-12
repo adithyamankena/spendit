@@ -114,6 +114,14 @@ label{display:block;font-size:12px;color:#9da6bc;font-weight:750;margin-bottom:5
 .bar span{position:absolute;bottom:-25px;left:50%;transform:translateX(-50%);font-size:10px;color:#8e97ad;white-space:nowrap}
 .statrow{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.08)}
 .spend-breakdown{display:grid;grid-template-columns:210px 1fr;gap:22px;align-items:center}
+.tx-filters{display:grid;grid-template-columns:minmax(220px,1fr) 150px 130px 180px;gap:10px;margin-bottom:8px}
+.tx-search-wrap{position:relative}
+.tx-search-wrap input{padding-left:38px}
+.tx-search-icon{position:absolute;left:13px;top:50%;transform:translateY(-51%);color:var(--muted);font-size:20px;pointer-events:none}
+.tx-filter-hint{font-size:12px;color:var(--muted);margin:0 0 15px}
+@media(max-width:900px){.tx-filters{grid-template-columns:1fr 1fr}.tx-search-wrap{grid-column:1/-1}}
+@media(max-width:700px){.tx-filters{grid-template-columns:1fr 1fr}.tx-filter-hint{line-height:1.45}}
+
 .spend-donut-wrap{display:flex;align-items:center;justify-content:center;min-height:210px}
 .spend-donut{
  width:184px;height:184px;border-radius:50%;position:relative;
@@ -577,11 +585,32 @@ function transactions(){
    <div class="card"><div class="label">TRANSACTION COUNT</div><div class="value">${arr.length}</div><div class="hint">All entries this month</div></div>
    <div class="card"><div class="label">NET FLOW</div><div class="value">${money(t.income-t.spend)}</div><div class="hint">Income minus spending</div></div>
   </div>
-  <section class="section"><div style="display:flex;gap:10px;margin-bottom:15px"><input id="txSearch" placeholder="Search merchant, category, bank or payment method" oninput="filterTx()"><select id="txBank" onchange="filterTx()"><option value="">All banks</option>${BANKS.map(b=>`<option>${b}</option>`).join('')}</select></div>
-  <div style="overflow:auto"><table id="txTable"><thead><tr><th>Date</th><th>Source / Merchant</th><th>Category</th><th>Bank</th><th>Payment method</th><th>Amount</th><th></th></tr></thead><tbody>${arr.map(txRow).join('')}</tbody></table></div>
-  ${!arr.length?`<div class="empty">No transactions recorded for ${monthLabel(selectedMonth)}.</div>`:''}</section>`;
+  <section class="section">
+   <div class="tx-filters">
+    <div class="tx-search-wrap"><span class="tx-search-icon">⌕</span><input id="txSearch" placeholder="Search transactions" autocomplete="off" oninput="filterTx()" aria-label="Search transactions"></div>
+    <select id="txBank" onchange="filterTx()" aria-label="Filter by bank"><option value="">All banks</option>${BANKS.map(b=>`<option value="${esc(b)}">${esc(b)}</option>`).join('')}</select>
+    <select id="txType" onchange="filterTx()" aria-label="Filter by type"><option value="">All</option><option value="income">Income</option><option value="expense">Expense</option></select>
+    <select id="txCategory" onchange="filterTx()" aria-label="Filter by category"><option value="">All categories</option>${state.categories.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('')}</select>
+   </div>
+   <div class="tx-filter-hint">Search by merchant, category, bank or payment method. Use the filters to narrow your results.</div>
+   <div style="overflow:auto"><table id="txTable"><thead><tr><th>Date</th><th>Source / Merchant</th><th>Category</th><th>Bank</th><th>Payment method</th><th>Amount</th><th></th></tr></thead><tbody>${arr.map(txRow).join('')}</tbody></table></div>
+   ${!arr.length?`<div class="empty">No transactions recorded for ${monthLabel(selectedMonth)}.</div>`:''}
+  </section>`;
 }
-function filterTx(){const q=(txSearch.value||'').toLowerCase(),b=txBank.value;document.querySelectorAll('#txTable tbody tr').forEach(r=>{r.style.display=(!q||r.textContent.toLowerCase().includes(q))&&(!b||r.children[3].textContent===b)?'':'none'})}
+function filterTx(){
+  const q=(document.getElementById('txSearch')?.value||'').trim().toLowerCase();
+  const bank=document.getElementById('txBank')?.value||'';
+  const type=document.getElementById('txType')?.value||'';
+  const category=document.getElementById('txCategory')?.value||'';
+  document.querySelectorAll('#txTable tbody tr').forEach(r=>{
+    const text=r.textContent.toLowerCase();
+    const matchesSearch=!q||text.includes(q);
+    const matchesBank=!bank||r.children[3]?.textContent.trim()===bank;
+    const matchesType=!type||r.querySelector('.income,.expense')?.classList.contains(type);
+    const matchesCategory=!category||r.children[2]?.textContent.trim()===category;
+    r.style.display=(matchesSearch&&matchesBank&&matchesType&&matchesCategory)?'':'none';
+  });
+}
 
 function income(){
   const arr=state.transactions.filter(t=>t.type==='income'&&t.date&&(selectedMonth==='all'||t.date.slice(0,7)===selectedMonth));
