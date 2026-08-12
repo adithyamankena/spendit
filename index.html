@@ -1286,6 +1286,71 @@ body{
 }
 </style>
 
+
+<style>
+/* Change 7 FIXED6 — exact sidebar/content alignment */
+@media (min-width:701px){
+  .main{
+    position:absolute!important;
+    left:253px!important;
+    right:0!important;
+    top:0!important;
+    width:auto!important;
+    min-width:0!important;
+    margin:0!important;
+    padding:18px 18px 30px 10px!important;
+    box-sizing:border-box!important;
+  }
+  .content{
+    display:block!important;
+    width:100%!important;
+    max-width:none!important;
+    margin:0!important;
+    padding:10px 0 20px!important;
+    box-sizing:border-box!important;
+  }
+  #content{
+    width:100%!important;
+    max-width:none!important;
+    margin:0!important;
+    box-sizing:border-box!important;
+  }
+  #content > .section,
+  #content > .grid2{
+    width:100%!important;
+    max-width:none!important;
+    box-sizing:border-box!important;
+  }
+}
+@media (max-width:700px){
+  .main{
+    position:relative!important;
+    left:auto!important;
+    right:auto!important;
+    top:auto!important;
+    width:100%!important;
+    margin:0!important;
+    padding:7px 8px 96px!important;
+  }
+  .content{
+    width:100%!important;
+    max-width:none!important;
+    margin:0!important;
+    padding:8px 2px 12px!important;
+  }
+}
+body{background:#EEF2F0!important;color:#000!important}
+#content h1,#content h2,#content h3,#content p,#content .value,#content .label,#content .hint,#content th,#content td{color:#000!important}
+#content .hint,#content .label,#content th{opacity:.64}
+.topbar.actions-only,.sidebar,.card,.section{
+  background:rgba(255,255,255,.70)!important;
+  border-color:rgba(255,255,255,.80)!important;
+  box-shadow:0 12px 32px rgba(0,0,0,.08),inset 0 1px 0 rgba(255,255,255,.95)!important;
+  backdrop-filter:blur(24px) saturate(145%)!important;
+  -webkit-backdrop-filter:blur(24px) saturate(145%)!important;
+}
+</style>
+
 </head>
 <body>
 
