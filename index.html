@@ -276,6 +276,7 @@ button,a,select,input{touch-action:manipulation}
 @media(max-width:700px){.auth-card{padding:24px;border-radius:24px}}
 </style>
 
+<link rel="manifest" href="./manifest.webmanifest">
 </head>
 <body>
 
@@ -621,5 +622,14 @@ sb.auth.onAuthStateChange(async(event,session)=>{
   else document.getElementById('authScreen').style.display='flex';
 })();
 </script>
+
+<script>
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('./sw.js', {scope: './'}).catch(function(){});
+  });
+}
+</script>
+
 </body>
 </html>

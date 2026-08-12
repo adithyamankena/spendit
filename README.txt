@@ -1,20 +1,26 @@
-SPENDIT CLOUD SYNC VERSION
+SPENDIT STANDALONE PWA — GITHUB PAGES
 
-Replace these files in the ROOT of the GitHub Pages repository:
-- index.html
-- manifest.webmanifest
-- sw.js
-- icon-192.png
-- icon-512.png
+Replace these files in the ROOT of the GitHub repository:
+index.html
+manifest.webmanifest
+sw.js
+icon-192.png
+icon-512.png
 
-This version:
-- Uses Supabase email/password authentication.
-- Uses the Supabase publishable key in the browser.
-- Stores transactions in public.transactions with user_id.
-- Uses the existing RLS policies for SELECT/INSERT/UPDATE/DELETE.
-- Syncs transactions across laptop/phone when signed into the same account.
+The manifest uses:
+id: /spendit/
+start_url: /spendit/
+scope: /spendit/
+display: standalone
 
-Important:
-- Never publish a Supabase secret/service-role key.
-- The publishable key is intended for frontend use with RLS.
-- After deployment, uninstall the old SpendIt PWA and reinstall it so the new service worker is used.
+This keeps the PWA identity stable and launches it as a standalone app rather than a normal Chrome tab.
+
+After uploading:
+1. Commit the changes and wait for GitHub Pages to deploy.
+2. On Android, uninstall the currently installed SpendIt app.
+3. Open https://adithyamankena.github.io/spendit/ in Chrome.
+4. Sign in.
+5. Tap Chrome menu -> Install.
+6. Open SpendIt from the new app icon.
+
+Do not change Supabase settings.
